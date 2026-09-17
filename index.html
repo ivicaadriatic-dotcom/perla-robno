@@ -103,6 +103,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue"
 /* ═══ MAIN ═══ */
 .main{margin-left:228px;flex:1;padding:24px 24px 60px}
 
+/* ── MOBILNI PRIKAZ ── */
+@media(max-width:768px){
+  .sb{
+    transform:translateX(-100%);
+    transition:transform .25s ease;
+    z-index:300;
+    width:260px;
+  }
+  .sb.open{
+    transform:translateX(0);
+    box-shadow:4px 0 24px rgba(0,0,0,.18);
+  }
+  .sb-overlay{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.4);
+    z-index:299;
+  }
+  .sb-overlay.show{ display:block; }
+  .main{
+    margin-left:0;
+    padding:12px 12px 80px;
+  }
+  .mob-menu-btn{
+    display:flex;
+    position:fixed;
+    top:12px;left:12px;
+    z-index:298;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    width:40px;height:40px;
+    align-items:center;justify-content:center;
+    cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+  }
+  .ph{ padding-top:52px !important; }
+  .ph h2{ font-size:16px; }
+  .pha{ flex-wrap:wrap; gap:6px; }
+  .btn.bsm{ font-size:11px; padding:6px 10px; }
+  .fr.c4{ grid-template-columns:1fr 1fr; }
+  .fr.c3{ grid-template-columns:1fr 1fr; }
+  .sc-grid{ grid-template-columns:repeat(2,1fr) !important; }
+  .hero{ padding:14px 16px; }
+  .hero h2{ font-size:22px; }
+  table{ font-size:11px; }
+  .mobox{ width:98% !important; max-width:98% !important; }
+}
+@media(min-width:769px){
+  .mob-menu-btn{ display:none; }
+}
+
 /* ═══ HERO ═══ */
 .hero{background:linear-gradient(135deg,#0D3F62 0%,#1A6B8A 55%,#1E8FAC 100%);border-radius:var(--r);padding:26px 30px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-50px;right:180px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.035);pointer-events:none}
@@ -293,8 +346,16 @@ tbody tr:hover td{background:#F9FAFB}
 </head>
 <body>
 
+<!-- Mobilni hamburger gumb -->
+<button class="mob-menu-btn" id="mob-menu-btn" onclick="toggleMobMenu()">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+<div class="sb-overlay" id="sb-overlay" onclick="toggleMobMenu()"></div>
+
 <!-- ═══ SIDEBAR ═══ -->
-<nav class="sb">
+<nav class="sb" id="sidebar">
   <div class="sb-logo">
     <div class="sb-brand">
       <div class="sb-mark" id="sb-mark">
@@ -1518,7 +1579,18 @@ function onCityChg(){
   document.getElementById('hero-city').textContent=c;
 }
 
+function toggleMobMenu(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sb-overlay');
+  if(!sb||!ov)return;
+  const open=sb.classList.toggle('open');
+  ov.classList.toggle('show',open);
+}
 function gv(id,btn){
+  // Zatvori mobilni sidebar
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sb-overlay');
+  if(sb&&window.innerWidth<=768){sb.classList.remove('open');ov&&ov.classList.remove('show');}
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(n=>n.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
