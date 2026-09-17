@@ -104,19 +104,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue"
 .main{margin-left:228px;flex:1;padding:24px 24px 60px}
 
 /* ── MOBILNI PRIKAZ ── */
-@media(max-width:768px){
-  .sb{ transform:translateX(-100%); transition:transform .25s; z-index:300; width:260px; }
+@media screen and (max-width:768px){
+  .sb{ transform:translateX(-100%); transition:transform .25s; z-index:300; width:75vw; max-width:280px; }
   .sb.open{ transform:translateX(0); box-shadow:4px 0 24px rgba(0,0,0,.2); }
   .sb-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:299; }
   .sb-overlay.show{ display:block; }
-  .main{ margin-left:0 !important; padding:58px 10px 60px !important; }
-  .mob-menu-btn{ display:flex; position:fixed; top:10px; left:10px; z-index:298; background:var(--teal); color:#fff; border:none; border-radius:10px; width:42px; height:42px; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.2); }
-  .sc-grid{ grid-template-columns:repeat(2,1fr) !important; gap:8px !important; }
+  .main{ margin-left:0 !important; padding:58px 8px 60px !important; min-width:0; }
+  .mob-menu-btn{ display:flex !important; position:fixed; top:10px; left:10px; z-index:298; background:var(--teal); color:#fff; border:none; border-radius:10px; width:42px; height:42px; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.2); }
+  .sc-grid{ grid-template-columns:repeat(2,1fr) !important; gap:8px !important; margin-bottom:10px !important; }
+  .sc{ padding:12px 10px !important; min-width:0; }
+  .sc-val{ font-size:22px !important; }
   .fr.c4,.fr.c3{ grid-template-columns:1fr 1fr !important; }
-  .mobox{ width:96% !important; max-width:96% !important; }
-  .tw{ overflow-x:auto; }
+  .fr.c2{ grid-template-columns:1fr !important; }
+  .mobox{ width:96vw !important; max-width:96vw !important; }
+  .tw{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .ph{ flex-direction:column !important; align-items:flex-start !important; gap:8px !important; }
+  .pha{ flex-wrap:wrap !important; gap:6px !important; }
+  .hero{ padding:12px !important; }
+  .db-bottom{ grid-template-columns:1fr !important; }
 }
-@media(min-width:769px){ .mob-menu-btn{ display:none !important; } }
+@media screen and (min-width:769px){ .mob-menu-btn{ display:none !important; } }
 
 /* ═══ HERO ═══ */
 .hero{background:linear-gradient(135deg,#0D3F62 0%,#1A6B8A 55%,#1E8FAC 100%);border-radius:var(--r);padding:26px 30px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
@@ -146,7 +153,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue"
 .ib svg{width:14px;height:14px}
 
 /* ═══ STAT CARDS ═══ */
-.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.sc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+@media(max-width:600px){body .sc-grid{grid-template-columns:1fr 1fr!important}}
 /* Kartice u dashboard 3-col gridu uvijek iste visine */
 .dash-grid > .card, .dash-grid > div > .card { height:100%; box-sizing:border-box; }
 .sc{background:#fff;border-radius:var(--r);padding:16px 16px 14px;box-shadow:var(--sh);cursor:pointer;transition:box-shadow .15s}
