@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<title>Perla Notte — Excel Generator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#F2F6FA;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.wrap{background:#fff;border-radius:16px;padding:40px;max-width:600px;width:95%;box-shadow:0 4px 32px rgba(0,0,0,.1)}
+.logo{background:#0F4C75;color:#fff;border-radius:10px;padding:16px 24px;margin-bottom:24px;text-align:center}
+.logo h1{font-size:20px;font-weight:800}
+.logo p{font-size:12px;opacity:.8;margin-top:4px}
+.drop{border:2px dashed #1A6B8A;border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:.2s;background:#EFF6FB}
+.drop:hover,.drop.over{background:#D4EAF5;border-color:#0F4C75}
+.drop svg{width:48px;height:48px;color:#1A6B8A;margin-bottom:12px}
+.drop h2{font-size:16px;color:#0F4C75;margin-bottom:6px}
+.drop p{font-size:13px;color:#6B7280}
+input[type=file]{display:none}
+.status{margin-top:20px;padding:14px 18px;border-radius:10px;font-size:14px;display:none}
+.status.ok{background:#D1FAE5;color:#065F46;display:block}
+.status.err{background:#FEE2E2;color:#991B1B;display:block}
+.status.info{background:#EFF6FB;color:#1A6B8A;display:block}
+.files{margin-top:20px;display:none}
+.files h3{font-size:13px;font-weight:700;color:#374151;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.file-btn{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#EFF6FB;border:1px solid #C8D4DD;border-radius:8px;margin-bottom:6px;cursor:pointer;transition:.15s}
+.file-btn:hover{background:#D4EAF5}
+.file-btn span{font-size:13px;color:#0F4C75;font-weight:600;flex:1}
+.file-btn .dl{font-size:11px;color:#1A6B8A}
+.all-btn{background:#0F4C75!important;border-color:#0F4C75!important;margin-top:8px}
+.all-btn span{color:#fff!important}
+.all-btn .dl{color:#F59E0B!important;font-weight:700}
+.hint{margin-top:20px;font-size:11px;color:#9CA3AF;text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <h1>📊 Perla Notte — Excel Generator</h1>
+    <p>Generiraj obojene Excel tablice iz backup datoteke</p>
+  </div>
+  <div class="drop" id="drop" onclick="document.getElementById('fi').click()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <h2>Klikni ili povuci JSON backup ovdje</h2>
+    <p>perla-notte-backup.json</p>
+    <input type="file" id="fi" accept=".json" onchange="loadJSON(this)">
+  </div>
+  <div class="status" id="status"></div>
+  <div class="files" id="files">
+    <h3>Preuzmi tablice</h3>
+    <div id="file-list"></div>
+  </div>
+  <div class="hint">U aplikaciji: Sidebar → <strong>Izvezi bazu</strong> → spremi JSON → dovuci ovdje</div>
+</div>
+
+<script>
+// Drag & drop
+const drop=document.getElementById('drop');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');const f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.json'))processFile(f);else setStatus('Molim povucite .json datoteku!','err');});
+function loadJSON(inp){if(inp.files[0])processFile(inp.files[0]);}
+function setStatus(msg,type='info'){const s=document.getElementById('status');s.textContent=msg;s.className='status '+type;}
+
+// ── Konstante ──────────────────────────────────────────────────────────
+const G_NAP=27,G_PAK=2270;
+function g2kg(g){return(+g/1000).toFixed(3);}
+function g2pak(g){return(+g/G_PAK).toFixed(2);}
+function g2nap(g){return Math.floor(+g/G_NAP);}
+
+const FLAVOR_BG={
+  'Dubai Chocolate':        [253,230,138],
+  'Strawberry':             [254,205,211],
+  'Chocolate-Hazelnut':     [254,240,138],
+  'Swiss Chocolate Supreme':[253,186,116],
+  'Cookies & Cream':        [203,213,225],
+  'Vanilla Madagascar':      [252,211,77],
+  'Chocolate Jaffa':        [252,165,161],
+  'Chocolate Banana':       [253,224,71],
+};
+
+// ── XML builder za .xlsx ───────────────────────────────────────────────
+function rgb(r,g,b){return('FF'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0')).toUpperCase();}
+
+const C_TEAL_DARK=rgb(15,76,117);
+const C_TEAL_MED =rgb(26,107,138);
+const C_TEAL_LITE=rgb(239,246,251);
+const C_SUM_BG   =rgb(26,58,74);
+const C_GOLD     =rgb(245,158,11);
+const C_WHITE    =rgb(255,255,255);
+const C_ALT      =rgb(240,247,250);
+const C_DARK     =rgb(31,41,55);
+
+function buildXlsx(sheets){
+  // sheets = [{name, headers, rows, totalRow, okusCol, colWidths, title, subtitle}]
+  const today=new Date().toLocaleDateString('hr-HR');
+
+  // Collect all unique fills, fonts, borders, formats
+  const fills=[
+    {rgb:'00000000'},        // 0: none (required)
+    {rgb:'00000000'},        // 1: none (required)
+    {rgb:C_TEAL_DARK},       // 2: header bg
+    {rgb:C_TEAL_MED},        // 3: subtitle bg
+    {rgb:C_SUM_BG},          // 4: sum row
+    {rgb:C_WHITE},           // 5: white
+    {rgb:C_ALT},             // 6: alt row
+    {rgb:C_TEAL_LITE},       // 7: teal lite
+    ...Object.values(FLAVOR_BG).map(([r,g,b])=>({rgb:rgb(r,g,b)})) // 8-15: flavors
+  ];
+  const flavorFillIdx={};
+  Object.keys(FLAVOR_BG).forEach((k,i)=>{flavorFillIdx[k]=8+i;});
+
+  const fonts=[
+    // 0: default
+    `<font><sz val="9"/><name val="Arial"/><color rgb="${C_DARK}"/></font>`,
+    // 1: header (white bold)
+    `<font><sz val="9"/><b/><name val="Arial"/><color rgb="${C_WHITE}"/></font>`,
+    // 2: title (white bold 14)
+    `<font><sz val="14"/><b/><name val="Arial"/><color rgb="${C_WHITE}"/></font>`,
+    // 3: subtitle (white italic 9)
+    `<font><sz val="9"/><i/><name val="Arial"/><color rgb="${C_WHITE}"/></font>`,
+    // 4: sum gold bold
+    `<font><sz val="9"/><b/><name val="Arial"/><color rgb="${C_GOLD}"/></font>`,
+    // 5: total white bold 11
+    `<font><sz val="11"/><b/><name val="Arial"/><color rgb="${C_WHITE}"/></font>`,
+    // 6: total gold bold 11
+    `<font><sz val="11"/><b/><name val="Arial"/><color rgb="${C_GOLD}"/></font>`,
+    // 7: data dark bold (first col)
+    `<font><sz val="9"/><b/><name val="Arial"/><color rgb="${C_DARK}"/></font>`,
+    // 8: data dark normal
+    `<font><sz val="9"/><name val="Arial"/><color rgb="${C_DARK}"/></font>`,
+  ];
+
+  const thin=`<left style="thin"><color rgb="FFC8D4DD"/></left><right style="thin"><color rgb="FFC8D4DD"/></right><top style="thin"><color rgb="FFC8D4DD"/></top><bottom style="thin"><color rgb="FFC8D4DD"/></bottom>`;
+  const med=`<left style="medium"><color rgb="${C_TEAL_MED}"/></left><right style="medium"><color rgb="${C_TEAL_MED}"/></right><top style="medium"><color rgb="${C_TEAL_MED}"/></top><bottom style="medium"><color rgb="${C_TEAL_MED}"/></bottom>`;
+  const borders=[`<border>${thin}</border>`,`<border>${med}</border>`,`<border><left/><right/><top/><bottom/></border>`];
+
+  // xfs (cell format styles)
+  // idx: fill, font, border, align
+  const xfs=[
+    // 0: default
+    `<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 1: title (merged, teal dark, white bold 14, center)
+    `<xf numFmtId="0" fontId="2" fillId="2" borderId="2" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>`,
+    // 2: subtitle (teal med, white italic, left)
+    `<xf numFmtId="0" fontId="3" fillId="3" borderId="2" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 3: column header (teal dark, white bold, center, wrap)
+    `<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>`,
+    // 4: data white, dark, left, thin border
+    `<xf numFmtId="0" fontId="8" fillId="5" borderId="0" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 5: data white, dark BOLD (first col), left
+    `<xf numFmtId="0" fontId="7" fillId="5" borderId="0" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 6: data alt, dark, left
+    `<xf numFmtId="0" fontId="8" fillId="6" borderId="0" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 7: data alt, dark BOLD, left
+    `<xf numFmtId="0" fontId="7" fillId="6" borderId="0" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 8: sum row, gold bold, center
+    `<xf numFmtId="0" fontId="4" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 9: sum row first col white bold
+    `<xf numFmtId="0" fontId="1" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`,
+    // 10: total row first col white bold 11
+    `<xf numFmtId="0" fontId="5" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>`,
+    // 11: total row gold bold 11
+    `<xf numFmtId="0" fontId="6" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>`,
+  ];
+
+  // Add flavor xf styles (fills 8-15)
+  const flavorXfStart=xfs.length;
+  Object.keys(FLAVOR_BG).forEach((k,i)=>{
+    xfs.push(`<xf numFmtId="0" fontId="7" fillId="${8+i}" borderId="0" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>`);
+  });
+  const flavorXfIdx={};
+  Object.keys(FLAVOR_BG).forEach((k,i)=>{flavorXfIdx[k]=flavorXfStart+i;});
+
+  function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function col(n){let s='';n++;while(n>0){s=String.fromCharCode(64+(n%26||26))+s;n=Math.floor((n-1)/26);}return s;}
+  function cellRef(r,c){return col(c)+(r+1);}
+
+  function buildSheet(cfg){
+    const {name,headers,rows,totalRow,okusCol,colWidths,title,subtitle}=cfg;
+    const nc=headers.length;
+    let xml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+    xml+='<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">';
+
+    // Freeze pane
+    xml+='<sheetViews><sheetView tabSelected="1" workbookViewId="0">';
+    xml+='<pane ySplit="4" topLeftCell="A5" activePane="bottomLeft" state="frozen"/>';
+    xml+='</sheetView></sheetViews>';
+
+    // Row heights
+    xml+='<sheetFormatPr defaultRowHeight="16"/>';
+    xml+='<cols>';
+    const widths=colWidths||headers.map(()=>14);
+    widths.forEach((w,i)=>{xml+=`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`;});
+    xml+='</cols>';
+
+    xml+='<sheetData>';
+
+    // Row 1: Title
+    xml+=`<row r="1" ht="30" customHeight="1">`;
+    xml+=`<c r="${cellRef(0,0)}" s="1" t="s"><v>0</v></c>`;
+    xml+='</row>';
+
+    // Row 2: Subtitle
+    xml+=`<row r="2" ht="18" customHeight="1">`;
+    xml+=`<c r="${cellRef(1,0)}" s="2" t="s"><v>1</v></c>`;
+    xml+='</row>';
+
+    // Row 3: empty
+    xml+=`<row r="3" ht="5" customHeight="1"/>`;
+
+    // Row 4: Headers
+    xml+=`<row r="4" ht="28" customHeight="1">`;
+    headers.forEach((h,ci)=>{
+      xml+=`<c r="${cellRef(3,ci)}" s="3" t="inlineStr"><is><t>${esc(h)}</t></is></c>`;
+    });
+    xml+='</row>';
+
+    // Data rows
+    let altIdx=0;
+    rows.forEach((row,ri)=>{
+      const er=5+ri;
+      const isSum=row.isSum||false;
+      if(!isSum)altIdx++;
+      const isAlt=!isSum&&altIdx%2===0;
+
+      xml+=`<row r="${er}" ht="${isSum?18:16}" customHeight="1">`;
+      row.data.forEach((val,ci)=>{
+        const isOkus=ci===okusCol&&row.okus&&flavorXfIdx[row.okus]!==undefined;
+        let xf;
+        if(isOkus) xf=flavorXfIdx[row.okus];
+        else if(isSum) xf=ci===0?9:8;
+        else if(isAlt) xf=ci===0?7:6;
+        else xf=ci===0?5:4;
+
+        const v=val??'';
+        if(v==='') xml+=`<c r="${cellRef(er-1,ci)}" s="${xf}"/>`;
+        else xml+=`<c r="${cellRef(er-1,ci)}" s="${xf}" t="inlineStr"><is><t>${esc(v)}</t></is></c>`;
+      });
+      xml+='</row>';
+    });
+
+    // Total row
+    if(totalRow){
+      const er=5+rows.length;
+      xml+=`<row r="${er}" ht="22" customHeight="1">`;
+      totalRow.forEach((val,ci)=>{
+        const xf=ci===0?10:11;
+        const v=val??'';
+        xml+=`<c r="${cellRef(er-1,ci)}" s="${xf}" t="inlineStr"><is><t>${esc(v)}</t></is></c>`;
+      });
+      xml+='</row>';
+    }
+
+    xml+='</sheetData>';
+
+    // Merges for title + subtitle
+    xml+='<mergeCells>';
+    xml+=`<mergeCell ref="A1:${col(nc-1)}1"/>`;
+    xml+=`<mergeCell ref="A2:${col(nc-1)}2"/>`;
+    xml+='</mergeCells>';
+
+    // Page setup
+    xml+='<pageSetup orientation="landscape" fitToPage="1" fitToWidth="1" fitToHeight="0"/>';
+    xml+='</worksheet>';
+
+    return {name,xml,strings:[title,`${subtitle}  ·  Export: ${today}`]};
+  }
+
+  // Process all sheets
+  const allStrings=[];
+  const sheetXmls=[];
+  sheets.forEach(cfg=>{
+    const {name,xml,strings}=buildSheet(cfg);
+    const base=allStrings.length;
+    strings.forEach(s=>allStrings.push(s));
+    // Fix string refs in xml
+    let fixedXml=xml;
+    strings.forEach((s,i)=>{
+      // Replace <v>i</v> with actual index
+      fixedXml=fixedXml.replace(`<v>${i}</v>`,`<v>${base+i}</v>`);
+    });
+    sheetXmls.push({name,xml:fixedXml});
+  });
+
+  // Build shared strings
+  const sst=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${allStrings.length}" uniqueCount="${allStrings.length}">${allStrings.map(s=>`<si><t xml:space="preserve">${esc(s)}</t></si>`).join('')}</sst>`;
+
+  // Styles XML
+  const stylesXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<fonts count="${fonts.length}">${fonts.join('')}</fonts>
+<fills count="${fills.length}">${fills.map(f=>`<fill><patternFill patternType="${f.rgb==='00000000'?'none':'solid'}">${f.rgb==='00000000'?'':'<fgColor rgb="'+f.rgb+'"/>'}</patternFill></fill>`).join('')}</fills>
+<borders count="${borders.length}">${borders.join('')}</borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs>
+</styleSheet>`;
+
+  // Workbook XML
+  const wbXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetXmls.map((s,i)=>`<sheet name="${esc(s.name)}" sheetId="${i+1}" r:id="rId${i+2}"/>`).join('')}</sheets></workbook>`;
+
+  const wbRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${sheetXmls.map((s,i)=>`<Relationship Id="rId${i+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}</Relationships>`;
+
+  const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+
+  const contentTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>${sheetXmls.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+
+  // Assemble ZIP using JSZip-like approach with pure JS
+  // We'll use the Blob + zip trick
+  return {wbXml,wbRels,rootRels,contentTypes,stylesXml,sst,sheetXmls};
+}
+
+// ── ZIP builder (minimal, no library) ────────────────────────────────────
+function str2ab(str){const b=new TextEncoder().encode(str);return b;}
+
+function crc32(data){
+  let crc=0xFFFFFFFF;
+  for(let i=0;i<data.length;i++){
+    crc^=data[i];
+    for(let j=0;j<8;j++) crc=(crc>>>1)^(crc&1?0xEDB88320:0);
+  }
+  return(crc^0xFFFFFFFF)>>>0;
+}
+
+function makeZip(files){
+  // files = [{name, data: Uint8Array}]
+  const parts=[];
+  const centralDir=[];
+  let offset=0;
+
+  files.forEach(({name,data})=>{
+    const nameBytes=new TextEncoder().encode(name);
+    const crc=crc32(data);
+    const size=data.length;
+
+    // Local file header
+    const lh=new DataView(new ArrayBuffer(30+nameBytes.length));
+    lh.setUint32(0,0x04034b50,true); // signature
+    lh.setUint16(4,20,true);  // version
+    lh.setUint16(6,0,true);   // flags
+    lh.setUint16(8,0,true);   // compression (stored)
+    lh.setUint16(10,0,true);  // mod time
+    lh.setUint16(12,0,true);  // mod date
+    lh.setUint32(14,crc,true);
+    lh.setUint32(18,size,true);
+    lh.setUint32(22,size,true);
+    lh.setUint16(26,nameBytes.length,true);
+    lh.setUint16(28,0,true);
+    new Uint8Array(lh.buffer).set(nameBytes,30);
+
+    // Central directory entry
+    const cd=new DataView(new ArrayBuffer(46+nameBytes.length));
+    cd.setUint32(0,0x02014b50,true);
+    cd.setUint16(4,20,true); cd.setUint16(6,20,true);
+    cd.setUint16(8,0,true); cd.setUint16(10,0,true);
+    cd.setUint16(12,0,true); cd.setUint16(14,0,true);
+    cd.setUint32(16,crc,true);
+    cd.setUint32(20,size,true);
+    cd.setUint32(24,size,true);
+    cd.setUint16(28,nameBytes.length,true);
+    cd.setUint16(30,0,true); cd.setUint16(32,0,true);
+    cd.setUint16(34,0,true); cd.setUint16(36,0,true);
+    cd.setUint32(38,0,true);
+    cd.setUint32(42,offset,true);
+    new Uint8Array(cd.buffer).set(nameBytes,46);
+
+    parts.push(new Uint8Array(lh.buffer));
+    parts.push(data);
+    centralDir.push(new Uint8Array(cd.buffer));
+    offset+=30+nameBytes.length+size;
+  });
+
+  const cdOffset=offset;
+  const cdSize=centralDir.reduce((a,b)=>a+b.length,0);
+
+  // End of central directory
+  const eocd=new DataView(new ArrayBuffer(22));
+  eocd.setUint32(0,0x06054b50,true);
+  eocd.setUint16(4,0,true); eocd.setUint16(6,0,true);
+  eocd.setUint16(8,files.length,true);
+  eocd.setUint16(10,files.length,true);
+  eocd.setUint32(12,cdSize,true);
+  eocd.setUint32(16,cdOffset,true);
+  eocd.setUint16(20,0,true);
+
+  const all=[...parts,...centralDir,new Uint8Array(eocd.buffer)];
+  const total=all.reduce((a,b)=>a+b.length,0);
+  const buf=new Uint8Array(total);
+  let pos=0;
+  all.forEach(a=>{buf.set(a,pos);pos+=a.length;});
+  return buf;
+}
+
+function downloadXlsx(sheetsCfg, filename){
+  const {wbXml,wbRels,rootRels,contentTypes,stylesXml,sst,sheetXmls}=buildXlsx(sheetsCfg);
+  const files=[
+    {name:'[Content_Types].xml',   data:str2ab(contentTypes)},
+    {name:'_rels/.rels',           data:str2ab(rootRels)},
+    {name:'xl/workbook.xml',       data:str2ab(wbXml)},
+    {name:'xl/_rels/workbook.xml.rels', data:str2ab(wbRels)},
+    {name:'xl/styles.xml',         data:str2ab(stylesXml)},
+    {name:'xl/sharedStrings.xml',  data:str2ab(sst)},
+    ...sheetXmls.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`,data:str2ab(s.xml)})),
+  ];
+  const zip=makeZip(files);
+  const blob=new Blob([zip],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=filename; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Data builders ─────────────────────────────────────────────────────
+function buildProdaja(D){
+  const headers=['DATUM','OKUS','NAPITAKA','POTROŠENO (g)','OSTALO (g)','NAP. OSTAJE','VRIJEDNOST (€)','KANAL','OPERATER'];
+  const sorted=[...D.prodaja].sort((a,b)=>b.datum.localeCompare(a.datum));
+  const grouped={};
+  sorted.forEach(e=>{grouped[e.datum]=(grouped[e.datum]||[]).concat(e);});
+  const rows=[];let tN=0,tG=0,tE=0;
+  Object.entries(grouped).forEach(([dan,entries])=>{
+    entries.forEach(e=>{
+      const ost=+(e.stockPoslije||0);
+      rows.push({data:[dan,e.okus,e.kom+'',e.potrebnoG+'g',ost.toFixed(0)+'g',g2nap(ost)+'',parseFloat(e.ukupno||0).toFixed(2)+' €',e.kanal,e.operater||'—'],okus:e.okus});
+    });
+    const dn=entries.reduce((a,e)=>a+e.kom,0);
+    const dg=entries.reduce((a,e)=>a+e.potrebnoG,0);
+    const de=entries.reduce((a,e)=>a+parseFloat(e.ukupno||0),0);
+    rows.push({data:['Ukupno '+dan,'',dn+'',dg+'g','','',de.toFixed(2)+' €','',''],isSum:true});
+    tN+=dn;tG+=dg;tE+=de;
+  });
+  return {headers,rows,totalRow:['UKUPNO','',tN+'',tG+'g','','',tE.toFixed(2)+' €','',''],okusCol:1,colWidths:[14,26,10,14,12,12,14,16,18],title:'PRODAJA NAPITAKA',subtitle:D.cfg?.company||'Perla Notte d.o.o.'};
+}
+
+function buildStanje(D){
+  const headers=['ARTIKL','OKUS','GRAD','ZALIHA (g)','ZALIHA (kg)','PAKIRANJA','NAPITAKA','MIN NORMATIV','STATUS'];
+  const rows=[];let tG=0;
+  D.products.forEach((p,i)=>{
+    const g=+(p.stock||0);const n=D.normativi?.[p.id];const mn=n?.min||0;
+    const status=g>=mn?'Normalno':g>0?'Nisko':'Kritično';
+    rows.push({data:[p.name,p.flavor||'—',p.city,g.toFixed(0),g2kg(g),g2pak(g),g2nap(g)+'',mn?mn+'g':'—',status],okus:p.flavor});
+    tG+=g;
+  });
+  return {headers,rows,totalRow:['UKUPNO','','',tG.toFixed(0)+'g',g2kg(tG)+'kg',g2pak(tG),g2nap(tG)+'','',''],okusCol:1,colWidths:[16,26,10,12,12,12,12,14,12],title:'STANJE ZALIHA',subtitle:D.cfg?.company||'Perla Notte d.o.o.'};
+}
+
+function buildFakture(D){
+  const headers=['BROJ FAKTURE','DOBAVLJAČ','DATUM','GRAD','STAVKE','UKUPNO'];
+  const rows=[...D.fakture].reverse().map(f=>{
+    const st=(f.stavke||[]).map(s=>`${s.artikl} ${s.okus} (${s.kolicina} ${s.jedinica})`).join(' | ');
+    const uk=(f.stavke||[]).reduce((a,s)=>a+parseFloat(s.kolicina||0),0);
+    return {data:[f.broj,f.dobavljac,f.datum,f.grad,st,uk.toFixed(2)+' pak.']};
+  });
+  return {headers,rows,totalRow:null,okusCol:-1,colWidths:[16,22,12,10,50,12],title:'ULAZ PO FAKTURAMA',subtitle:D.cfg?.company||'Perla Notte d.o.o.'};
+}
+
+function buildOtpis(D){
+  const headers=['ARTIKL','KOLIČINA (g)','KG','STROJ','DATUM','OPERATER','RAZLOG','NAPOMENA'];
+  const rows=[...D.stroj].reverse().map(e=>{
+    const g=+(e.kolicina||0);
+    return {data:[e.artikl,g.toFixed(0)+'g',g2kg(g)+'kg',e.stroj,e.datum,e.operater||'—',e.razlog,e.napomena||'—']};
+  });
+  return {headers,rows,totalRow:null,okusCol:-1,colWidths:[24,14,12,20,14,18,22,20],title:'OTPIS / KOREKCIJA',subtitle:D.cfg?.company||'Perla Notte d.o.o.'};
+}
+
+function buildArtikli(D){
+  const headers=['#','ARTIKL','OKUS','KATEGORIJA','DOBAVLJAČ','ŠIFRA','ZALIHA (g)','CIJENA (€)'];
+  const rows=D.products.map((p,i)=>({
+    data:[(i+1)+'',p.name,p.flavor||'—',p.category,p.dobavljac||'—',p.sifra||'—',(+(p.stock||0)).toFixed(0)+'g',p.cijena?p.cijena+' €':'—'],okus:p.flavor
+  }));
+  return {headers,rows,totalRow:null,okusCol:2,colWidths:[6,16,26,18,22,12,12,12],title:'BAZA ARTIKALA',subtitle:D.cfg?.company||'Perla Notte d.o.o.'};
+}
+
+function buildDob(D){
+  const headers=['NAZIV','OIB','ADRESA','GRAD','TELEFON','EMAIL','WEB','KATEGORIJA','KONTAKT'];
+  const rows=D.dobavljaci.map(d=>({data:[d.name,d.oib||'—',d.adr||'—',d.city||'—',d.tel||'—',d.email||'—',d.web||'—',d.kat||'—',d.kontakt||'—']}));
+  return {headers,rows,totalRow:null,okusCol:-1,colWidths:[24,16,22,10,16,22,22,18,18],title:'BAZA DOBAVLJAČA',subtitle:D.cfg?.company||'Perla Notte d.o.o.'};
+}
+
+function buildPovijest(D){
+  const headers=['DATUM/VRIJEME','VRSTA','ARTIKL','KOLIČINA','REFERENCA','GRAD'];
+  const rows=[...D.povijest].reverse().map(e=>({data:[e.dt,e.vrsta,e.artikl,e.kolicina,e.ref||'—',e.grad||'—']}));
+  return {headers,rows,totalRow:null,okusCol:-1,colWidths:[18,20,22,16,16,12],title:'POVIJEST PROMJENA',subtitle:D.cfg?.company||'Perla Notte d.o.o.'};
+}
+
+// ── Main ───────────────────────────────────────────────────────────────
+function processFile(file){
+  setStatus('Čitam datoteku...','info');
+  document.getElementById('files').style.display='none';
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const D=JSON.parse(e.target.result);
+      if(!D.products) throw new Error('Nije valjani Perla Notte backup');
+
+      const generators=[
+        {icon:'🛍️',name:'Prodaja napitaka',    fn:()=>downloadXlsx([{...buildProdaja(D),   name:'Prodaja'}],    'Prodaja-06-2026.xlsx')},
+        {icon:'📦',name:'Stanje zaliha',        fn:()=>downloadXlsx([{...buildStanje(D),    name:'Stanje'}],     'Stanje-zaliha-06-2026.xlsx')},
+        {icon:'📥',name:'Fakture',              fn:()=>downloadXlsx([{...buildFakture(D),   name:'Fakture'}],    'Fakture-06-2026.xlsx')},
+        {icon:'⚙️',name:'Otpis / Korekcija',   fn:()=>downloadXlsx([{...buildOtpis(D),     name:'Otpis'}],      'Otpis-06-2026.xlsx')},
+        {icon:'🏷️',name:'Artikli',             fn:()=>downloadXlsx([{...buildArtikli(D),   name:'Artikli'}],    'Artikli-06-2026.xlsx')},
+        {icon:'🏢',name:'Dobavljači',           fn:()=>downloadXlsx([{...buildDob(D),       name:'Dobavljaci'}], 'Dobavljaci-06-2026.xlsx')},
+        {icon:'📋',name:'Povijest',             fn:()=>downloadXlsx([{...buildPovijest(D),  name:'Povijest'}],   'Povijest-06-2026.xlsx')},
+      ];
+
+      const list=document.getElementById('file-list'); list.innerHTML='';
+      generators.forEach(g=>{
+        const btn=document.createElement('div');
+        btn.className='file-btn';
+        btn.innerHTML=`<span>${g.icon} ${g.name}</span><span class="dl">⬇ Preuzmi</span>`;
+        btn.onclick=g.fn; list.appendChild(btn);
+      });
+
+      const allBtn=document.createElement('div');
+      allBtn.className='file-btn all-btn';
+      allBtn.innerHTML='<span>📊 Preuzmi SVE tablice (7)</span><span class="dl">⬇⬇⬇</span>';
+      allBtn.onclick=()=>{
+        allBtn.querySelector('span').textContent='⏳ Generiranje...';
+        let i=0;
+        const next=()=>{if(i<generators.length){generators[i++].fn();setTimeout(next,300);}else{allBtn.querySelector('span').textContent='✅ Sve preuzeto!';setTimeout(()=>{allBtn.querySelector('span').textContent='📊 Preuzmi SVE tablice (7)';},2000);}};
+        next();
+      };
+      list.appendChild(allBtn);
+
+      document.getElementById('files').style.display='block';
+      setStatus(`✅ Uspješno! ${D.products.length} artikala · ${(D.prodaja||[]).length} prodaja · ${(D.fakture||[]).length} faktura`,'ok');
+    }catch(err){setStatus('❌ Greška: '+err.message,'err');console.error(err);}
+  };
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>
