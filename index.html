@@ -16,6 +16,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>var TEST_MODE = false;</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -70,7 +71,7 @@ body.dark .rl{ border-bottom-color:#2C2C2E; }
 body, .card, .sb, .mobox, .sc, .nb, .btn, input, select, textarea{
   transition: background-color .25s, border-color .25s, color .15s;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;background:var(--bg);color:var(--tx);display:flex;min-height:100vh;font-size:14px;line-height:1.5}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif;background:var(--bg);color:var(--tx);display:flex;min-height:100vh;font-size:14px;line-height:1.5}
 
 /* ── Prijava ─────────────────────────────────────────────────────────── */
 #auth-gate{position:fixed;inset:0;z-index:99999;background:#F4F6F8;
@@ -334,6 +335,99 @@ tbody tr:hover td{background:#F9FAFB}
 
 @media print{.sb,.pha,.ta,.sr,.fa,.btn,button,.toast{display:none!important}.main{margin:0;padding:10px}.card{box-shadow:none;border:1px solid #ddd}body{background:#fff}}
 
+
+/* ══════════ APARATI · PRIHODI · MOBILNI (HACCP stil) ══════════ */
+:root{--ap-blue:#0A84FF;--ap-green:#30D158;--ap-orange:#FF9F0A;--ap-purple:#BF5AF2;--ap-red:#FF453A;--grp:#F2F2F7;--inp:#fff}
+body.dark{--grp:#232326;--inp:#2C2C2E}
+.ap-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--ap-orange)}
+.ap-ico svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ap-ico.g{background:var(--ap-green)}.ap-ico.b{background:var(--ap-blue)}.ap-ico.p{background:var(--ap-purple)}.ap-ico.o{background:var(--ap-orange)}
+/* sidebar izbor aparata */
+.sb-ap{margin-top:10px}
+.sb-ap select{width:100%;padding:7px 28px 7px 10px;border:1px solid var(--br);border-radius:9px;font:600 12.5px inherit;font-family:inherit;color:var(--tx);background:var(--grp);-webkit-appearance:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+/* pilula aparata */
+.ap-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:none;background:var(--grp);color:var(--tx);font:600 14px -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;cursor:pointer}
+.ap-pill svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.ap-live{width:9px;height:9px;border-radius:50%;background:var(--ap-green);box-shadow:0 0 0 3px rgba(48,209,88,.18)}
+.ap-live.off{background:#8E8E93;box-shadow:none}
+/* glava aparata (plava kartica) */
+.ap-head{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:18px;color:#fff;
+  background:linear-gradient(120deg,#0A84FF 0%,#3B6BF5 55%,#5E5CE6 100%);box-shadow:0 10px 30px rgba(10,132,255,.28)}
+.ap-num{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0}
+.ap-head-l{font-size:12px;opacity:.85;font-weight:600}
+.ap-head-t{font-size:21px;font-weight:800;letter-spacing:-.3px;line-height:1.15}
+.ap-head-s{font-size:12.5px;opacity:.85;margin-top:3px}
+.ap-status{margin-left:auto;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.22);font-size:12px;font-weight:700;white-space:nowrap}
+/* KPI kartice */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+.kpi{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--sh);border:1px solid var(--br)}
+.kpi-top{display:flex;align-items:center;gap:10px;color:var(--tx2);font-size:13px;font-weight:500}
+.kpi-v{font-size:25px;font-weight:800;letter-spacing:-.5px;color:var(--tx);margin-top:12px;line-height:1.1}
+.kpi-s{font-size:12.5px;color:var(--tx2);margin-top:5px}
+/* kartice aparata */
+.ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.ap-card{background:var(--card);border:1px solid var(--br);border-radius:20px;overflow:hidden;box-shadow:var(--sh);cursor:pointer;transition:transform .12s}
+.ap-card:hover{transform:translateY(-2px)}
+.ap-card .ap-head{border-radius:0;box-shadow:none;padding:14px 16px}
+.ap-card .ap-head-t{font-size:17px}
+.ap-card-b{display:grid;grid-template-columns:1fr 1fr 1fr;padding:12px 16px 14px;gap:8px}
+.ap-card-b div{font-size:11.5px;color:var(--tx2)}
+.ap-card-b strong{display:block;font-size:15px;color:var(--tx);margin-top:2px}
+.ap-card-f{display:flex;gap:8px;padding:0 16px 14px}
+.ap-card-new{border:2px dashed var(--br2);background:transparent;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:170px;color:var(--ap-blue);font-weight:700;gap:8px}
+.ap-strip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;margin-bottom:16px;-webkit-overflow-scrolling:touch}
+.ap-chip{flex:0 0 auto;min-width:190px;background:var(--card);border:1px solid var(--br);border-radius:16px;padding:12px 14px;cursor:pointer;box-shadow:var(--sh)}
+.ap-chip b{font-size:14px;color:var(--tx)}
+.ap-chip span{display:block;font-size:12px;color:var(--tx2);margin-top:2px}
+.ap-chip em{font-style:normal;display:block;font-size:17px;font-weight:800;color:var(--ap-green);margin-top:8px}
+/* modal aparata (iOS grupirani obrazac) */
+.apbox{background:var(--card);border-radius:22px;width:100%;max-width:560px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.apbox-h{padding:18px 20px 12px;position:relative}
+.apbox-e{font-size:12px;font-weight:700;color:var(--ap-blue);letter-spacing:.4px}
+.apbox-t{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-.3px;margin-top:2px}
+.apbox-x{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:none;background:var(--grp);color:var(--tx2);cursor:pointer;font-size:16px}
+.apbox-b{overflow-y:auto;padding:0 20px 16px}
+.apsec{font-size:12px;font-weight:600;color:var(--tx2);margin:18px 4px 7px}
+.apgrp{background:var(--grp);border-radius:16px;overflow:hidden}
+.aprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--br)}
+.aprow:last-child{border-bottom:none}
+.aprow label{flex:1;font-size:14.5px;font-weight:600;color:var(--tx);min-width:0}
+.aprow input,.aprow select{width:52%;max-width:260px;padding:9px 12px;border-radius:10px;border:1px solid transparent;background:var(--inp);color:var(--tx);font:14px -apple-system,BlinkMacSystemFont,sans-serif;text-align:right;outline:none}
+.aprow select{text-align:left;text-align-last:right}
+.aprow input:focus,.aprow select:focus{border-color:var(--ap-blue)}
+.aprow.col{flex-wrap:wrap}.aprow.col textarea{width:100%;min-height:70px;border-radius:12px;border:1px solid transparent;background:var(--inp);color:var(--tx);padding:10px 12px;font:14px -apple-system,sans-serif;resize:vertical;outline:none}
+.apbox-f{display:flex;gap:10px;padding:14px 20px;border-top:1px solid var(--br);background:var(--card)}
+.apbtn{padding:12px 18px;border-radius:14px;border:none;font:700 14.5px -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer}
+.apbtn.pri{background:var(--ap-blue);color:#fff}.apbtn.sec{background:var(--grp);color:var(--tx)}.apbtn.del{background:rgba(255,69,58,.12);color:var(--ap-red);margin-right:auto}
+/* odabir aparata (list) */
+.apsel-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--br);cursor:pointer}
+.apsel-row:last-child{border-bottom:none}
+.apsel-row.on{background:rgba(10,132,255,.1)}
+.apsel-row b{font-size:15px;color:var(--tx)}.apsel-row span{display:block;font-size:12.5px;color:var(--tx2)}
+/* prihodi */
+.ph-eye{font-size:13px;font-weight:700;color:var(--ap-blue);letter-spacing:.8px}
+.ph-ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 4px}
+.ph-ctl select{padding:10px 34px 10px 14px;border-radius:14px;border:1px solid var(--br);background:var(--grp);color:var(--tx);font:600 14px -apple-system,sans-serif;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.ph-new{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:14px;border:none;background:var(--ap-blue);color:#fff;font:700 14.5px -apple-system,sans-serif;cursor:pointer;box-shadow:0 8px 20px rgba(10,132,255,.3)}
+.ph-list-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--br);font-size:13px}
+.ph-list-row:last-child{border-bottom:none}
+.ph-bar{height:6px;border-radius:3px;background:var(--grp);flex:1;overflow:hidden}.ph-bar i{display:block;height:100%;border-radius:3px}
+.test-rib{background:#FF9F0A;color:#1C1C1E;font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:12px;margin-bottom:14px}
+/* mobilne trake — skrivene na PC-u */
+.mtop,.mtab{display:none}
+/* spriječi širenje stranice preko ruba (široke tablice) */
+.main{min-width:0}
+.two-col>*,.dash-grid>*,.fr>*{min-width:0}
+.card:has(table){overflow-x:auto}
+.ph{min-width:0}.pha{flex-wrap:wrap}
+.ap-head-t{font-weight:750;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif}
+.ap-card .ap-head-t{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap-card .ap-head-s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap-card .ap-head>div:nth-child(2){min-width:0;flex:1}
+.ap-card .ap-head-s{white-space:normal!important;overflow:visible!important;line-height:1.3}
+
 /* ── Logo ─────────────────────────────────────────────────────────────── */
 .sb-mark.has-logo{width:auto!important;height:auto!important;background:none!important;padding:0!important;border-radius:0!important}
 .sb-mark.has-logo #sb-logo-img{width:176px!important;height:auto!important;max-height:72px;object-fit:contain!important;border-radius:0!important}
@@ -373,6 +467,44 @@ tbody tr:hover td{background:#F9FAFB}
   .fr>*,.fg{min-width:0!important;grid-column:1/-1!important}
   .fg input,.fg select,.fg textarea{max-width:100%!important;min-width:0!important}
   .card{padding-left:14px!important;padding-right:14px!important}
+}
+/* ══════════ MOBILNI — HACCP izgled (mora biti na kraju) ══════════ */
+@media(max-width:900px){
+  .mob-menu-btn{display:none!important}
+  .mtop{display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:205;
+    height:calc(64px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 14px 0 16px;
+    background:rgba(242,242,247,.86);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--br)}
+  body.dark .mtop{background:rgba(0,0,0,.82)}
+  .mtop-logo{height:42px;width:auto;mix-blend-mode:multiply}
+  body.dark .mtop-logo{filter:invert(1);mix-blend-mode:screen}
+  .mtop-r{display:flex;align-items:center;gap:12px}
+  .mtab{display:flex;align-items:flex-end;justify-content:space-around;position:fixed;left:0;right:0;bottom:0;z-index:205;
+    padding:6px 6px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(242,242,247,.9);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--br)}
+  body.dark .mtab{background:rgba(22,22,24,.92)}
+  .mtab button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--tx2);font:500 11px -apple-system,sans-serif;padding:4px 0;cursor:pointer}
+  .mtab button svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .mtab button.on{color:var(--ap-blue)}
+  .mtab .fab{flex:0 0 auto;width:62px;height:62px;border-radius:50%;background:var(--ap-blue);color:#fff;margin:0 6px 6px;transform:translateY(-14px);
+    box-shadow:0 10px 26px rgba(10,132,255,.45);justify-content:center}
+  .mtab .fab svg{width:30px;height:30px;stroke-width:2.4}
+  .main{padding:calc(80px + env(safe-area-inset-top,0px)) 16px calc(112px + env(safe-area-inset-bottom,0px))!important}
+  .ph h2{font-size:30px!important;font-weight:800!important;letter-spacing:-.6px}
+  .ph p{font-size:14px!important}
+  .sc-grid,.kpi-grid{grid-template-columns:1fr 1fr!important;gap:12px!important}
+  .sc{border-radius:20px!important;padding:14px!important}
+  .sc-ico{border-radius:11px!important}
+  .sc-ico.orange{background:var(--ap-orange)!important}.sc-ico.purple{background:var(--ap-purple)!important}.sc-ico.green{background:var(--ap-green)!important}
+  .sc-ico.blue{background:var(--ap-blue)!important}.sc-ico.red{background:var(--ap-red)!important}
+  .sc-ico svg{stroke:#fff!important}
+  .card{border-radius:20px!important}
+  .kpi{padding:14px!important}.kpi-v{font-size:21px!important}
+  .ap-head-t{font-size:18px}
+  .ap-grid{grid-template-columns:1fr}
+  .mo{align-items:flex-end!important;padding:0!important}
+  .apbox{max-width:100%!important;border-radius:22px 22px 0 0!important;max-height:94vh}
+  .aprow input,.aprow select{width:56%}
+  .hero{display:none!important}
 }
 </style>
 </head>
@@ -426,6 +558,7 @@ tbody tr:hover td{background:#F9FAFB}
         <option>Šibenik</option><option>Karlovac</option>
       </select>
     </div>
+    <div class="sb-ap"><select id="sb-ap-sel" onchange="setApSel(this.value)" aria-label="Aparat"></select></div>
   </div>
 
   <div class="sb-sec">
@@ -446,6 +579,10 @@ tbody tr:hover td{background:#F9FAFB}
       <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span>
       Prodaja napitaka
     </button>
+    <button class="nb" onclick="gv('prihodi',this)">
+      <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.5A7 7 0 1 0 17 17.5"/><line x1="4" y1="10" x2="13" y2="10"/><line x1="4" y1="14" x2="13" y2="14"/></svg></span>
+      Prihodi
+    </button>
     <button class="nb" onclick="gv('normativi',this)">
       <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
       Normativi
@@ -458,6 +595,10 @@ tbody tr:hover td{background:#F9FAFB}
 
   <div class="sb-sec">
     <div class="sb-sec-lbl">Baza podataka</div>
+    <button class="nb" onclick="gv('aparati',this)">
+      <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><rect x="8" y="5" width="8" height="7" rx="1"/><line x1="10" y1="16" x2="14" y2="16"/></svg></span>
+      Aparati
+    </button>
     <button class="nb" onclick="gv('stanje',this)">
       <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></span>
       Stanje zaliha
@@ -493,24 +634,7 @@ tbody tr:hover td{background:#F9FAFB}
         <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
         Postavke
       </button>
-      <!-- DARK MODE TOGGLE -->
-      <button class="sb-foot-btn" onclick="toggleDark()" id="dark-btn">
-        <span class="ni" id="dark-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
-        <span id="dark-lbl">Tamna podloga</span>
-      </button>
-      <button class="sb-foot-btn" onclick="expAll()">
-        <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
-        Izvezi bazu
-      </button>
-      <button class="sb-foot-btn" onclick="document.getElementById('impall').click()">
-        <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
-        Uvezi bazu
-      </button>
       <input type="file" id="impall" accept=".json" style="display:none" onchange="impAll(this)">
-      <button class="sb-foot-btn" style="color:var(--teal)" onclick="document.getElementById('pn-excel-sidebar').click()">
-        <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
-        Uvezi dnevnu prodaju
-      </button>
       <input type="file" id="pn-excel-sidebar" accept=".xlsx,.xls" style="display:none" onchange="importPnExcel(this)">
     </div>
   </div>
@@ -529,6 +653,7 @@ tbody tr:hover td{background:#F9FAFB}
 <div id="view-dashboard" class="view on">
   <div class="ph"><div><h2>Nadzorna ploča</h2><p>Pregled trenutnog stanja</p></div>
     <div class="pha">
+      <button class="ap-pill" onclick="openApSheet()"><span class="ap-live"></span><span id="db-ap-pill">Svi aparati</span></button>
       <button class="btn bs bsm" onclick="openSettings()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         Postavke
@@ -555,6 +680,8 @@ tbody tr:hover td{background:#F9FAFB}
       </div>
     </div>
   </div>
+
+  <div id="ap-panel"></div>
 
   <!-- STAT CARDS -->
   <div class="sc-grid">
@@ -705,7 +832,7 @@ tbody tr:hover td{background:#F9FAFB}
       </div>
       <div class="fg"><label>Datum fakture</label><input type="date" id="fdat"></div>
       <div class="fg"><label>Grad / Lokacija</label>
-        <select id="fgr"><option>Split</option><option>Zagreb</option><option>Rijeka</option><option>Osijek</option><option>Zadar</option><option>Dubrovnik</option><option>Varaždin</option><option>Pula</option><option>Šibenik</option><option>Karlovac</option></select>
+        <select id="fgr"></select>
       </div>
     </div>
     <hr class="fdiv">
@@ -730,7 +857,7 @@ tbody tr:hover td{background:#F9FAFB}
     <div class="ct"><div class="ctl"><div class="ct-ico" style="background:#F3F4F6"><svg viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>Unesene fakture</div></div>
     <div class="sr"><div class="sw"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Pretraži fakture..." oninput="ft('faktb',this.value)"></div></div>
     <div class="tw"><table id="faktbl">
-      <thead><tr><th>Br. fakture</th><th>Dobavljač</th><th>Datum</th><th>Grad</th><th>Stavke</th><th>Ukupno</th><th>Akcije</th></tr></thead>
+      <thead><tr><th>Br. fakture</th><th>Dobavljač</th><th>Datum</th><th>Grad / lokacija</th><th>Stavke</th><th>Ukupno</th><th>Akcije</th></tr></thead>
       <tbody id="faktb"><tr><td colspan="7"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg><p>Nema faktura.</p></div></td></tr></tbody>
     </table></div>
   </div>
@@ -759,8 +886,8 @@ tbody tr:hover td{background:#F9FAFB}
       <div class="fg"><label>= kg</label>
         <input type="number" id="skol-kg" placeholder="npr. 2.27" min="0" step="0.01" oninput="strKolSync('kg')" style="background:var(--bg)">
       </div>
-      <div class="fg"><label>Stroj / Linija</label>
-        <select id="sstrj"><option>Stroj A — Linija 1</option><option>Stroj A — Linija 2</option><option>Stroj B — Linija 1</option><option>Stroj B — Linija 2</option><option>Stroj C</option><option>Ručna produkcija</option></select>
+      <div class="fg"><label>Grad / lokacija</label>
+        <select id="sstrj" onchange="lv()"></select>
       </div>
       <div class="fg"><label>Datum i vrijeme</label><input type="datetime-local" id="sdat"></div>
       <div class="fg"><label>Operater</label>
@@ -804,7 +931,7 @@ tbody tr:hover td{background:#F9FAFB}
     <div class="ct"><div class="ctl"><div class="ct-ico" style="background:#F3F4F6"><svg viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div>Povijest otpisa / korekcija</div></div>
     <div class="sr"><div class="sw"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Pretraži..." oninput="ft('strtb',this.value)"></div></div>
     <div class="tw"><table id="strtbl">
-      <thead><tr><th>Artikl</th><th>Količina</th><th>Stroj</th><th>Datum</th><th>Operater</th><th>Razlog</th><th>Napomena</th><th>Akcije</th></tr></thead>
+      <thead><tr><th>Artikl</th><th>Količina</th><th>Grad / lokacija</th><th>Datum</th><th>Operater</th><th>Razlog</th><th>Napomena</th><th>Akcije</th></tr></thead>
       <tbody id="strtb"><tr><td colspan="8"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg><p>Nema evidencije otpisa / korekcija.</p></div></td></tr></tbody>
     </table></div>
   </div>
@@ -863,15 +990,8 @@ tbody tr:hover td{background:#F9FAFB}
             <button class="btn bp bsm" onclick="addOpInline('prod-op-new','prod-op')" style="padding:8px 10px;flex-shrink:0">＋</button>
           </div>
         </div>
-        <div class="fg"><label>Kanal prodaje</label>
-          <select id="prod-kanal">
-            <option>Fitness centar</option>
-            <option>Šank / Bar</option>
-            <option>Dostava</option>
-            <option>Online narudžba</option>
-            <option>Događaj / Event</option>
-            <option>Ostalo</option>
-          </select>
+        <div class="fg"><label>Aparat</label>
+          <select id="prod-kanal" onchange="onProdApChange(this);prodLiveCalc()"></select>
         </div>
         <div class="fg"><label>Cijena po napitku (€)</label>
           <input type="number" id="prod-cij" placeholder="npr. 3.50" min="0" step="0.10" oninput="prodLiveCalc()">
@@ -957,6 +1077,34 @@ tbody tr:hover td{background:#F9FAFB}
 </div>
 
 <!-- NORMATIVI -->
+
+<!-- PRIHODI -->
+<div id="view-prihodi" class="view">
+  <div class="ph"><div><div class="ph-eye">Vending</div><h2>Prihodi</h2><p id="ph-sub"></p></div></div>
+  <div class="ph-ctl">
+    <select id="ph-god" onchange="renderPrihodi()"></select>
+    <select id="ph-per" onchange="renderPrihodi()"></select>
+    <button class="ph-new" onclick="novaProdaja()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova prodaja</button>
+  </div>
+  <div class="kpi-grid" id="ph-kpi"></div>
+  <div class="card">
+    <div class="ct"><div class="ctl"><span id="ph-ch-t">Mjesečni prihod</span></div><span id="ph-ch-s" style="font-size:12px;font-weight:500;color:var(--tx2)"></span></div>
+    <div style="height:260px;position:relative"><canvas id="ph-chart"></canvas></div>
+  </div>
+  <div class="dash-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card"><div class="ct"><div class="ctl">Prihod po okusu</div></div><div id="ph-okus"></div></div>
+    <div class="card"><div class="ct"><div class="ctl">Prihod po aparatu</div></div><div id="ph-apar"></div></div>
+  </div>
+</div>
+
+<!-- APARATI -->
+<div id="view-aparati" class="view">
+  <div class="ph"><div><div class="ph-eye">Vending</div><h2>Aparati</h2><p id="ap-sub"></p></div>
+    <div class="pha"><button class="ph-new" onclick="openApModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novi aparat</button></div>
+  </div>
+  <div class="ap-grid" id="ap-grid"></div>
+</div>
+
 <div id="view-normativi" class="view">
   <div class="ph"><div><h2>Normativi</h2><p>Minimalne i preporučene količine zaliha</p></div>
     <div class="pha">
@@ -989,7 +1137,7 @@ tbody tr:hover td{background:#F9FAFB}
 
 <!-- STANJE -->
 <div id="view-stanje" class="view">
-  <div class="ph"><div><h2>Stanje zaliha</h2><p>Trenutno stanje svih artikala u skladištu</p></div>
+  <div class="ph"><div><h2>Stanje zaliha</h2><p>Trenutno stanje artikala · <span class="ap-cur">svi aparati</span></p></div>
     <div class="pha">
       <button class="btn bsm bs" onclick="openImp()">📥 Import CSV</button>
       <button class="btn bsm bs" onclick="exXlsx('stantbl','Stanje_zaliha')">📊 Excel</button>
@@ -1240,7 +1388,7 @@ tbody tr:hover td{background:#F9FAFB}
 
 <!-- POVIJEST -->
 <div id="view-povijest" class="view">
-  <div class="ph"><div><h2>Izvještaji — povijest</h2><p>Kronološka evidencija svih događaja</p></div>
+  <div class="ph"><div><h2>Izvještaji — povijest</h2><p>Kronološka evidencija događaja · <span class="ap-cur">svi aparati</span></p></div>
     <div class="pha">
       <button class="btn bsm bs" onclick="exXlsx('povtbl','Povijest')">📊 Excel</button>
       <button class="btn bsm bs" onclick="exCsv('povtbl','povijest')">📄 CSV</button>
@@ -1269,7 +1417,7 @@ tbody tr:hover td{background:#F9FAFB}
         <div class="fg"><label>Broj fakture</label><input id="efbr"></div>
         <div class="fg"><label>Dobavljač</label><input id="efdob"></div>
         <div class="fg"><label>Datum</label><input type="date" id="efdat"></div>
-        <div class="fg"><label>Grad</label><select id="efgr"><option>Split</option><option>Zagreb</option><option>Rijeka</option><option>Osijek</option><option>Zadar</option><option>Dubrovnik</option><option>Varaždin</option><option>Pula</option><option>Šibenik</option><option>Karlovac</option></select></div>
+        <div class="fg"><label>Grad / lokacija</label><select id="efgr"></select></div>
       </div>
       <div style="border-top:1px solid var(--br);padding-top:12px">
         <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Stavke fakture</div>
@@ -1479,11 +1627,18 @@ tbody tr:hover td{background:#F9FAFB}
       <!-- TAB: PODACI -->
       <div class="set-pane" id="pane-podaci">
         <div class="set-sec">
+          <div class="set-sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dnevna prodaja</div>
+          <button class="btn bp" style="width:100%;justify-content:center;margin-bottom:4px" onclick="closeMo('mo-set');document.getElementById('pn-excel-sidebar').click()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Uvezi dnevnu prodaju (Excel)
+          </button>
+        </div>
+        <div class="set-sec">
           <div class="set-sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Izvoz podataka</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
             <button class="btn bs" style="justify-content:center" onclick="expAll()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export sve (JSON)
+              Izvezi bazu (JSON)
             </button>
             <button class="btn bs" style="justify-content:center" onclick="exCsv('dbtbl','svi-artikli')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
@@ -1532,6 +1687,54 @@ tbody tr:hover td{background:#F9FAFB}
 </div>
 
 <!-- DELETE CONFIRM -->
+
+<!-- MODAL: aparat -->
+<div class="mo" id="mo-ap" onclick="if(event.target===this)closeMo('mo-ap')">
+  <div class="apbox">
+    <div class="apbox-h">
+      <div class="apbox-e" id="apm-eye">NOVI · APARAT</div>
+      <div class="apbox-t">Vending aparati</div>
+      <button class="apbox-x" onclick="closeMo('mo-ap')" aria-label="Zatvori">✕</button>
+      <div class="ap-head" style="margin-top:14px">
+        <div class="ap-num" id="apm-num">01</div>
+        <div><div class="ap-head-l">Aparat</div><div class="ap-head-t" id="apm-title">VS-001</div></div>
+        <div class="ap-status" id="apm-stat">Aktivan</div>
+      </div>
+    </div>
+    <div class="apbox-b" id="apm-body"></div>
+    <div class="apbox-f">
+      <button class="apbtn del" id="apm-del" onclick="delAparat()">Obriši</button>
+      <button class="apbtn sec" onclick="closeMo('mo-ap')">Odustani</button>
+      <button class="apbtn pri" onclick="saveAparat()">Spremi unos</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: odabir aparata -->
+<div class="mo" id="mo-apsel" onclick="if(event.target===this)closeMo('mo-apsel')">
+  <div class="apbox" style="max-width:440px">
+    <div class="apbox-h"><div class="apbox-e" id="aps-eye">PRIKAZ</div><div class="apbox-t" id="aps-title">Odaberi aparat</div>
+      <button class="apbox-x" onclick="closeMo('mo-apsel')" aria-label="Zatvori">✕</button></div>
+    <div class="apbox-b"><div class="apgrp" id="aps-list"></div></div>
+    <div class="apbox-f"><button class="apbtn sec" style="flex:1" onclick="closeMo('mo-apsel');gv('aparati')">Upravljaj aparatima</button></div>
+  </div>
+</div>
+
+<!-- MOBILNE TRAKE -->
+<header class="mtop">
+  <img class="mtop-logo" id="mtop-logo" alt="Perla Notte">
+  <div class="mtop-r"><span class="ap-live" id="mtop-dot"></span>
+    <button class="ap-pill" onclick="openApSheet()"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><rect x="8" y="5" width="8" height="7" rx="1"/><line x1="10" y1="16" x2="14" y2="16"/></svg><span id="mtop-ap">Svi</span></button>
+  </div>
+</header>
+<nav class="mtab">
+  <button data-v="dashboard" onclick="gv('dashboard')"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2z"/></svg>Početna</button>
+  <button data-v="prodaja" onclick="gv('prodaja')"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>Prodaja</button>
+  <button class="fab" onclick="novaProdaja()" aria-label="Nova prodaja"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+  <button data-v="prihodi" onclick="gv('prihodi')"><svg viewBox="0 0 24 24"><path d="M17 6.5A7 7 0 1 0 17 17.5"/><line x1="4" y1="10" x2="13" y2="10"/><line x1="4" y1="14" x2="13" y2="14"/></svg>Prihodi</button>
+  <button data-v="vise" onclick="sbToggle(true)"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Više</button>
+</nav>
+
 <div class="mo" id="mo-del">
   <div class="mobox" style="max-width:340px">
     <div class="mohd"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>Potvrda brisanja</h3><button class="mox" onclick="closeMo('mo-del')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
@@ -1584,7 +1787,7 @@ const D={
 let eFakId=null,eStrId=null,eArtId=null,eDobId=null,delCb=null;
 let fSts='',fCity='',fCat='',fDobKat='',fArtiKat='',fArtiOkus='';
 
-window.addEventListener('DOMContentLoaded', agBoot);
+window.addEventListener('DOMContentLoaded', ()=>{ (TEST_MODE?testBoot:agBoot)(); });
 
 function bootApp(done){
   document.getElementById('fdat').valueAsDate = new Date();
@@ -1601,7 +1804,6 @@ function bootApp(done){
     const heroCity = document.getElementById('hero-city');
     if(heroCity) heroCity.textContent = CFG.city;
     const fgrEl = document.getElementById('fgr');
-    if(fgrEl) fgrEl.value = CFG.city;
 
     // Logo: tvornički, osim ako je korisnik učitao vlastiti
     if(!CFG.logoCustom || !CFG.logoData) CFG.logoData = DEFAULT_LOGO;
@@ -1633,7 +1835,6 @@ function bootApp(done){
 
 function onCityChg(){
   const c=document.getElementById('gCity').value;
-  document.getElementById('fgr').value=c;
   document.getElementById('hero-city').textContent=c;
 }
 
@@ -1654,7 +1855,8 @@ function gv(id,btn){
   document.getElementById('view-'+id).classList.add('on');
   if(btn)btn.classList.add('on');
   else document.querySelectorAll('.nb').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('on')});
-  renderAll();
+  renderAll();  updTab(id);
+  if(id!=='dashboard')window.scrollTo(0,0);
 }
 
 function setTab(id,btn){
@@ -1687,6 +1889,7 @@ function gp(id){return D.products.find(p=>p.id===id)}
 function gn(id){return D.normativi[id]||null}
 function ss(id){
   const p=gp(id);if(!p)return'none';
+  if((Number(p.stock)||0)<=0)return'crit';
   const n=gn(id);if(!n)return'ok';
   if(p.stock<=0||p.stock<n.min)return'crit';
   if(p.stock<n.opt*0.6)return'low';
@@ -1749,7 +1952,9 @@ function saveFak(){
   const br=document.getElementById('fbr').value.trim();
   const dob=document.getElementById('fdob').value.trim();
   const dat=document.getElementById('fdat').value;
-  const gr=document.getElementById('fgr').value;
+  const fAp=getAp(document.getElementById('fgr').value);
+  if(!fAp){toast('Odaberite grad / lokaciju (aparat)!','warn');return;}
+  const gr=apLok(fAp);
   if(!br||!dob||!dat){toast('Popunite sve podatke fakture!','warn');return;}
   const stavke=[];
   document.querySelectorAll('#stwrap .svrow').forEach(row=>{
@@ -1761,21 +1966,21 @@ function saveFak(){
     if(ime&&kol>0)stavke.push({artikl:ime,okus:ok,kategorija:kat,kolicina:kol,jedinica:jed});
   });
   if(!stavke.length){toast('Dodajte barem jednu stavku!','warn');return;}
-  D.fakture.push({id:uid(),broj:br,dobavljac:dob,datum:dat,grad:gr,stavke});
+  D.fakture.push({id:uid(),broj:br,dobavljac:dob,datum:dat,grad:gr,aparat_id:fAp.id,stavke});
   const ids=[];
   stavke.forEach(s=>{
     const id=pid(s.artikl,s.okus);
     let p=gp(id);
-    if(!p){p={id,name:s.artikl,flavor:s.okus,category:s.kategorija,unit:'g',stock:0,city:gr,lastEntry:dat};D.products.push(p);}
+    if(!p){p={id,name:s.artikl,flavor:s.okus,category:s.kategorija,unit:'g',stock:0,city:fAp.grad||'Split',lastEntry:dat};D.products.push(p);}
     // Konverzija u grame
     let addG=s.kolicina;
     if(s.jedinica==='kg') addG=s.kolicina*1000;
     else if(s.jedinica==='pakiranje') addG=s.kolicina*G_PO_PAKIRANJU;
-    p.stock+=addG; p.lastEntry=dat; p.city=gr; p.unit='g';
+    p.stock+=addG; p.lastEntry=dat; p.unit='g';
     D.povijest.push({dt:now(),vrsta:'Ulaz (faktura)',artikl:s.artikl+' '+s.okus,kolicina:'+'+s.kolicina+' '+s.jedinica,ref:br,grad:gr});
     ids.push(id);
   });
-  if(document.getElementById('setsp').checked)showSp('fak',ids);
+  if(document.getElementById('setsp').checked)withApView(()=>showSp('fak',ids), fAp.id);
   rstFak();renderAll();toast(`Faktura ${br} unesena (${stavke.length} stavki)!`);
 }
 
@@ -1809,7 +2014,7 @@ function editFak(id){
   document.getElementById('efbr').value=f.broj;
   document.getElementById('efdob').value=f.dobavljac;
   document.getElementById('efdat').value=f.datum;
-  document.getElementById('efgr').value=f.grad;
+  updApUI(); document.getElementById('efgr').value=f.aparat_id||apDefaultId();
   eFakId=id;
   // Popuni stavke
   const wrap=document.getElementById('ef-stavke');
@@ -1854,7 +2059,7 @@ function saveEFak(){
   f.broj=document.getElementById('efbr').value;
   f.dobavljac=document.getElementById('efdob').value;
   f.datum=document.getElementById('efdat').value;
-  f.grad=document.getElementById('efgr').value;
+  { const eAp=getAp(document.getElementById('efgr').value)||getAp(apDefaultId()); f.aparat_id=eAp.id; f.grad=apLok(eAp); }
   // Prikupi nove stavke
   const rows=document.getElementById('ef-stavke').children;
   f.stavke=[];
@@ -1869,7 +2074,7 @@ function saveEFak(){
   // Primijeni novi stock
   f.stavke.forEach(s=>{
     const id=pid(s.artikl,s.okus);let p=gp(id);
-    if(!p){p={id,name:s.artikl,flavor:s.okus,category:'Proteinski napitak',unit:'g',stock:0,city:f.grad,lastEntry:f.datum};D.products.push(p);}
+    if(!p){p={id,name:s.artikl,flavor:s.okus,category:'Proteinski napitak',unit:'g',stock:0,city:(getAp(f.aparat_id)||{}).grad||'Split',lastEntry:f.datum};D.products.push(p);}
     let g=s.kolicina;
     if(s.jedinica==='kg') g=s.kolicina*1000;
     else if(s.jedinica==='pakiranje') g=s.kolicina*G_PO_PAKIRANJU;
@@ -1921,26 +2126,29 @@ function lv(){
 function saveStr(){
   const artId=document.getElementById('sart').value;
   const g=parseFloat(document.getElementById('skol').value)||0;
-  const stroj=document.getElementById('sstrj').value;
+  const sAp=getAp(document.getElementById('sstrj').value);
+  if(!sAp){toast('Odaberite grad / lokaciju (aparat)!','warn');return;}
+  const stroj=apLok(sAp);
   const dat=document.getElementById('sdat').value;
   const op=document.getElementById('sop').value;
   const raz=document.getElementById('sraz').value;
   const nap=document.getElementById('snap').value;
   if(!artId||g<=0){toast('Odaberite artikl i unesite količinu (grame)!','warn');return;}
   const prod=gp(artId);if(!prod){toast('Artikl nije pronađen!','err');return;}
-  if(prod.stock<g){toast(`Nedovoljno! Ima ${prod.stock.toFixed(0)}g, tražiš ${g.toFixed(0)}g`,'err');return;}
+  { const imaAp=stockAp(sAp.id)[artId]||0; const staro=eStrId?((D.stroj.find(x=>x.id===eStrId)||{}).kolicina||0):0;
+    if(!eStrId&&imaAp<g){toast('Nedovoljno na '+sAp.oznaka+'! Ima '+imaAp.toFixed(0)+'g, tražiš '+g.toFixed(0)+'g','err');return;} }
   if(eStrId){
     const e=D.stroj.find(x=>x.id===eStrId);
-    if(e){e.kolicina=g;e.stroj=stroj;e.operater=op;e.razlog=raz;e.napomena=nap;}
+    if(e){e.kolicina=g;e.stroj=stroj;e.aparat_id=sAp.id;e.operater=op;e.razlog=raz;e.napomena=nap;}
     eStrId=null;document.getElementById('strttl').textContent='Nova korekcija / otpis';
   } else {
     prod.stock-=g;
-    D.stroj.push({id:uid(),artikl_id:artId,artikl:prod.name+(prod.flavor?' '+prod.flavor:''),kolicina:g,stroj,datum:dat,operater:op,razlog:raz,napomena:nap});
+    D.stroj.push({id:uid(),artikl_id:artId,artikl:prod.name+(prod.flavor?' '+prod.flavor:''),kolicina:g,stroj,aparat_id:sAp.id,datum:dat,operater:op,razlog:raz,napomena:nap});
     D.povijest.push({dt:now(),vrsta:'Otpis / Korekcija',artikl:prod.flavor||prod.name,kolicina:`-${g.toFixed(0)}g (${(g/G_PO_PAKIRANJU).toFixed(2)} pak.)`,ref:stroj,grad:prod.city});
-    if(document.getElementById('setsp')?.checked)showSp('str',[artId]);
+    if(document.getElementById('setsp')?.checked)withApView(()=>showSp('str',[artId]), sAp.id);
   }
   rstStr();renderAll();
-  toast(`✅ Uneseno ${g.toFixed(0)}g (${(g/G_PO_PAKIRANJU).toFixed(2)} pak.) — ostalo ${prod.stock.toFixed(0)}g = ${Math.floor(prod.stock/GRAMA_PO_NAPITKU)} napitaka`);
+  toast(`✅ Uneseno ${g.toFixed(0)}g (${(g/G_PO_PAKIRANJU).toFixed(2)} pak.) — na ${sAp.oznaka} ostalo ${(stockAp(sAp.id)[artId]||0).toFixed(0)}g = ${Math.floor((stockAp(sAp.id)[artId]||0)/GRAMA_PO_NAPITKU)} napitaka`);
 }
 function rstStr(){
   ['sart','skol','skol-pak','skol-kg','snap'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -1960,7 +2168,7 @@ function editStrInline(id){
   document.getElementById('skol').value=g.toFixed(0);
   document.getElementById('skol-pak').value=(g/G_PO_PAKIRANJU).toFixed(3);
   document.getElementById('skol-kg').value=(g/1000).toFixed(3);
-  document.getElementById('sstrj').value=e.stroj;
+  updApUI(); document.getElementById('sstrj').value=e.aparat_id||apDefaultId();
   document.getElementById('sdat').value=e.datum;
   document.getElementById('sop').value=e.operater||'';
   document.getElementById('sraz').value=e.razlog;
@@ -1984,7 +2192,7 @@ function editProdajaInline(id){
   document.getElementById('prod-kom').value=e.kom;
   document.getElementById('prod-dat').value=e.datum;
   document.getElementById('prod-op').value=e.operater||'';
-  document.getElementById('prod-kanal').value=e.kanal;
+  updApUI(); document.getElementById('prod-kanal').value=e.aparat_id||apDefaultId();
   document.getElementById('prod-cij').value=e.cij||'';
   document.getElementById('prod-nap').value=e.nap||'';
   document.getElementById('prod-form-title').textContent='Uredi prodaju: '+e.okus;
@@ -2146,7 +2354,7 @@ function removeLogo(){
    ✅ Chrome, ✅ Firefox, ✅ Edge, ✅ Safari
    Podaci ostaju trajno na disku lokalnog računala.
 ═══════════════════════════════════════════════════════ */
-const DB_NAME    = 'PerlaNotteRobno';
+const DB_NAME    = TEST_MODE ? 'PerlaNotteRobno_TEST' : 'PerlaNotteRobno';
 const DB_VERSION = 1;
 const DB_STORE   = 'appData';
 const KEY_DATA   = 'main_data';
@@ -2241,6 +2449,7 @@ function _snapFromD(){
       dobavljaci: JSON.stringify(D.dobavljaci),
       normativi:  JSON.stringify(D.normativi),
       ops:        JSON.stringify(D.ops),
+      aparati:    JSON.stringify(D.aparati||[]),
       stroj:      JSON.stringify(D.stroj),
       cfg:        JSON.stringify(CFG)
     }
@@ -2298,7 +2507,7 @@ async function cloudPushAll(){
     await _pushList('fakture',  D.fakture,  x=>x.id, 'fakture',  x=>({datum:x.datum||null}));
 
     const reg={products:D.products, dobavljaci:D.dobavljaci, normativi:D.normativi,
-               ops:D.ops, stroj:D.stroj, cfg:CFG};
+               ops:D.ops, aparati:D.aparati||[], stroj:D.stroj, cfg:CFG};
     const rows=[];
     Object.entries(reg).forEach(([k,v])=>{
       const j=JSON.stringify(v);
@@ -2334,7 +2543,8 @@ async function cloudPull(){
       normativi:  reg.normativi  || {},
       povijest:   (rh.data||[]).map(r=>r.podaci),
       dobavljaci: reg.dobavljaci || [],
-      ops:        reg.ops        || []
+      ops:        reg.ops        || [],
+      aparati:    reg.aparati    || []
     };
     await idbSet(KEY_DATA, JSON.stringify(payload));
     if(reg.cfg) await idbSet(KEY_CFG, JSON.stringify(reg.cfg));
@@ -2410,6 +2620,7 @@ function _snapFromPayload(p, cfg){
       dobavljaci: JSON.stringify(p.dobavljaci),
       normativi:  JSON.stringify(p.normativi),
       ops:        JSON.stringify(p.ops),
+      aparati:    JSON.stringify(p.aparati||[]),
       stroj:      JSON.stringify(p.stroj),
       cfg:        cfg ? JSON.stringify(cfg) : undefined
     }
@@ -2418,7 +2629,7 @@ function _snapFromPayload(p, cfg){
 function _preloadPayload(){
   const pre = PRELOADED_DATA;
   return { products:pre.products||[], fakture:pre.fakture||[], stroj:pre.stroj||[], prodaja:pre.prodaja||[],
-           normativi:pre.normativi||{}, povijest:pre.povijest||[], dobavljaci:pre.dobavljaci||[], ops:pre.ops||[] };
+           normativi:pre.normativi||{}, povijest:pre.povijest||[], dobavljaci:pre.dobavljaci||[], ops:pre.ops||[], aparati:pre.aparati||[] };
 }
 async function agStart(){
   const g=document.getElementById('auth-gate');
@@ -2461,7 +2672,8 @@ async function agStart(){
       _snap = cloudSnap;
       syRun(()=>cloudPushAll()).then(()=>toast('✓ Podaci usklađeni s oblakom'));
     } else {
-      _snap=_snapFromD();
+      if(cloudOk && res && !res.empty){ _snap=_snapFromPayload(res.payload, res.cfg); syRun(()=>cloudPushAll()); }
+      else _snap=_snapFromD();
       const mig=document.getElementById('sy-mig');
       if(mig && cloudOk && res && res.empty) mig.style.display='block';
     }
@@ -2483,6 +2695,348 @@ function agBoot(){
   });
 }
 
+
+/* ══════════════════════════════════════════════════════════════════════
+   VENDING APARATI · PRIHODI · MOBILNA NAVIGACIJA
+   ══════════════════════════════════════════════════════════════════════ */
+const AP_VS001 = {
+  id:'ap_vs001', oznaka:'VS-001', model:'GS805', vrsta:'Proteinski napitci (shake)', serijski:'',
+  vlasnik:'Perla Notte j.d.o.o.', status:'Aktivan', lokacija:'JOKER GYM', prostor:'4 KAT',
+  adresa:'Put brodarice 6, 21000 Split', adresaLok:'Put Brodarice 6', grad:'Split', gps:'43.520339, 16.446804',
+  datumInst:'2026-06-03', zadnjiServis:'', strojBroj:'', napomena:''
+};
+const AP_FIELDS = [
+  ['APARAT',[['oznaka','Oznaka','hash'],['model','Model','box'],['vrsta','Vrsta','tag'],['serijski','Serijski broj','code'],
+             ['strojBroj','Broj u Excel izvozu','code'],['vlasnik','Vlasnik','bld'],['status','Status','chk','sel']]],
+  ['LOKACIJA',[['lokacija','Naziv lokacije','pin'],['prostor','Prostor / kat','bld'],['adresa','Adresa','pin'],
+               ['adresaLok','Adresa lokacije','pin'],['grad','Grad','globe'],['gps','GPS (širina, dužina)','pin']]],
+  ['ODRŽAVANJE',[['datumInst','Datum instalacije','cal','date'],['zadnjiServis','Zadnji servis','cal','date'],['napomena','Napomena','note','area']]]
+];
+const AP_ICONS = {
+  hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+  box:'<rect x="5" y="2" width="14" height="20" rx="2"/><rect x="8" y="5" width="8" height="7" rx="1"/><line x1="10" y1="16" x2="14" y2="16"/>',
+  tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+  code:'<path d="M4 5v14M8 5v14M11 5v14M15 5v14M18 5v14M21 5v14"/>',
+  bld:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>',
+  chk:'<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>',
+  pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  note:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  eur:'<path d="M17 6.5A7 7 0 1 0 17 17.5"/><line x1="4" y1="10" x2="13" y2="10"/><line x1="4" y1="14" x2="13" y2="14"/>',
+  bars:'<line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+  cup:'<path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/>'
+};
+function apIco(k,cls){return '<span class="ap-ico '+(cls||'')+'"><svg viewBox="0 0 24 24">'+(AP_ICONS[k]||'')+'</svg></span>';}
+const MJ_NAZ=['Siječanj','Veljača','Ožujak','Travanj','Svibanj','Lipanj','Srpanj','Kolovoz','Rujan','Listopad','Studeni','Prosinac'];
+const MJ_GEN=['siječnja','veljače','ožujka','travnja','svibnja','lipnja','srpnja','kolovoza','rujna','listopada','studenoga','prosinca'];
+const DAN_NAZ=['Nedjelja','Ponedjeljak','Utorak','Srijeda','Četvrtak','Petak','Subota'];
+function eur(n){return (Number(n)||0).toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function hrDat(d){if(!d)return '—';const [y,m,dd]=d.split('-');return parseInt(dd)+'. '+MJ_GEN[parseInt(m)-1]+' '+y+'.';}
+function hrDatKr(d){if(!d)return '—';const [y,m,dd]=d.split('-');return dd+'.'+m+'.'+y+'.';}
+function prihodOf(p){const u=parseFloat(p.ukupno);return isNaN(u)?(Number(p.kom)||0)*(Number(p.cij)||0):u;}
+function escA(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+/* ── stanje odabira ── */
+let AP_SEL='all';
+try{AP_SEL=localStorage.getItem('pn_ap_sel')||'all';}catch(e){}
+function apList(){return Array.isArray(D.aparati)?D.aparati:[];}
+function getAp(id){return apList().find(a=>a.id===id)||null;}
+function apLabel(a){return a?(a.oznaka+' · '+(a.lokacija||'bez lokacije')):'—';}
+function apLok(a){return a?((a.grad||'—')+' / '+apLabel(a)):'—';}
+function apNum(a){const m=/(\d+)/.exec(a&&a.oznaka||'');return m?String(parseInt(m[1])).padStart(2,'0'):'—';}
+function nextOznaka(){let mx=0;apList().forEach(a=>{const m=/VS-(\d+)/i.exec(a.oznaka||'');if(m)mx=Math.max(mx,parseInt(m[1]));});return 'VS-'+String(mx+1).padStart(3,'0');}
+function apDefaultId(){if(AP_SEL!=='all'&&getAp(AP_SEL))return AP_SEL;const a=apList().find(x=>x.status!=='Neaktivan')||apList()[0];return a?a.id:'';}
+function prodOfAp(list){return AP_SEL==='all'?list:list.filter(p=>p.aparat_id===AP_SEL);}
+function setApSel(id){AP_SEL=id||'all';try{localStorage.setItem('pn_ap_sel',AP_SEL);}catch(e){}closeMo('mo-apsel');renderAll();}
+
+function ensureAparati(){
+  if(!Array.isArray(D.aparati)||!D.aparati.length) D.aparati=[Object.assign({},AP_VS001)];
+  const first=D.aparati[0];
+  (D.prodaja||[]).forEach(p=>{
+    if(!p.aparat_id||!getAp(p.aparat_id)){p.aparat_id=first.id;}
+  });
+  (D.fakture||[]).forEach(f=>{ if(!f.aparat_id||!getAp(f.aparat_id)){ f.aparat_id=first.id; f.grad=apLok(first); } });
+  (D.stroj||[]).forEach(s=>{ if(!s.aparat_id||!getAp(s.aparat_id)){ s.aparat_id=first.id; s.stroj=apLok(first); } });
+  (D.povijest||[]).forEach(e=>{
+    if(e.aparat_id&&getAp(e.aparat_id)) return;
+    const txt=[e.ref,e.grad,e.artikl].join(' ');
+    const hit=D.aparati.find(a=>a.oznaka&&txt.indexOf(a.oznaka)>=0);
+    e.aparat_id=(hit||first).id;
+  });
+  if(AP_SEL!=='all'&&!getAp(AP_SEL))AP_SEL='all';
+}
+
+/* ── UI: izbornici, pilula, prodajni obrazac ── */
+function updApUI(){
+  const sel=document.getElementById('sb-ap-sel');
+  if(sel){sel.innerHTML='<option value="all">Svi aparati ('+apList().length+')</option>'+apList().map(a=>'<option value="'+a.id+'">'+escA(apLabel(a))+'</option>').join('');sel.value=AP_SEL;}
+  const a=getAp(AP_SEL);
+  const pill=document.getElementById('mtop-ap');if(pill)pill.textContent=a?a.oznaka:'Svi aparati';
+  const dot=document.getElementById('mtop-dot');if(dot)dot.className='ap-live'+(a&&a.status!=='Aktivan'?' off':'');
+  const lg=document.getElementById('mtop-logo');if(lg&&!lg.src.startsWith('data:'))lg.src=(CFG&&CFG.logoData)||DEFAULT_LOGO;
+  const pk=document.getElementById('prod-kanal');
+  if(pk){const cur=pk.value;
+    pk.innerHTML=apList().map(x=>'<option value="'+x.id+'">'+escA(apLabel(x))+(x.status!=='Aktivan'?' ('+x.status.toLowerCase()+')':'')+'</option>').join('')+'<option value="__new">＋ Novi aparat…</option>';
+    pk.value=(cur&&cur!=='__new'&&getAp(cur))?cur:apDefaultId();}
+  ['fgr','efgr','sstrj'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const cur=el.value;
+    el.innerHTML=apList().map(x=>'<option value="'+x.id+'">'+escA(apLok(x))+'</option>').join('');
+    el.value=(cur&&getAp(cur))?cur:apDefaultId();});
+  document.querySelectorAll('.ap-cur').forEach(el=>{el.textContent=a?apLok(a):'svi aparati';});
+  const dh=document.getElementById('db-ap-pill');if(dh)dh.textContent=a?apLabel(a):'Svi aparati';
+}
+function onProdApChange(el){if(el.value==='__new'){el.value=apDefaultId();openApModal();}}
+function openApSheet(){
+  const L=document.getElementById('aps-list');
+  const row=(id,t,s,on)=>'<div class="apsel-row'+(on?' on':'')+'" onclick="setApSel(\''+id+'\')">'+apIco(id==='all'?'bars':'box',id==='all'?'b':'o')+'<div><b>'+escA(t)+'</b><span>'+escA(s)+'</span></div></div>';
+  const tdy=td();
+  L.innerHTML=row('all','Svi aparati',apList().length+' aparata · zbirni prikaz',AP_SEL==='all')+
+    apList().map(a=>{const dn=D.prodaja.filter(p=>p.aparat_id===a.id&&p.datum===tdy).reduce((s,p)=>s+prihodOf(p),0);
+      return row(a.id,apLabel(a),(a.adresaLok||a.adresa||a.grad||'')+' · danas '+eur(dn),AP_SEL===a.id);}).join('');
+  openMo('mo-apsel');
+}
+
+/* ── modal aparata ── */
+let eApId=null;
+function openApModal(id){
+  eApId=id||null;
+  const a=id?getAp(id):Object.assign({},AP_VS001,{id:'',oznaka:nextOznaka(),model:'GS805',serijski:'',strojBroj:'',lokacija:'',prostor:'',adresa:'',adresaLok:'',grad:'Split',gps:'',datumInst:td(),zadnjiServis:'',napomena:''});
+  document.getElementById('apm-eye').textContent=id?'UREDI · APARAT':'NOVI · APARAT';
+  document.getElementById('apm-del').style.visibility=id?'visible':'hidden';
+  let h='';
+  AP_FIELDS.forEach(([sec,rows])=>{
+    h+='<div class="apsec">'+sec.charAt(0)+sec.slice(1).toLowerCase()+'</div><div class="apgrp">';
+    rows.forEach(([k,lab,ic,typ])=>{
+      const v=escA(a[k]||'');
+      if(typ==='area'){h+='<div class="aprow col">'+apIco(ic)+'<label for="apf-'+k+'">'+lab+'</label><textarea id="apf-'+k+'">'+v+'</textarea></div>';return;}
+      let inp;
+      if(typ==='sel') inp='<select id="apf-'+k+'" onchange="apmPreview()">'+['Aktivan','Na servisu','Neaktivan'].map(o=>'<option'+(o===a[k]?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+      else inp='<input id="apf-'+k+'" type="'+(typ==='date'?'date':'text')+'" value="'+v+'" oninput="apmPreview()"'+(k==='strojBroj'?' placeholder="popuni se kod uvoza"':'')+'>';
+      h+='<div class="aprow">'+apIco(ic)+'<label for="apf-'+k+'">'+lab+'</label>'+inp+'</div>';
+    });
+    h+='</div>';
+  });
+  document.getElementById('apm-body').innerHTML=h;
+  apmPreview();openMo('mo-ap');
+}
+function apmPreview(){
+  const g=k=>{const e=document.getElementById('apf-'+k);return e?e.value.trim():'';};
+  const o=g('oznaka')||'VS-???';const m=/(\d+)/.exec(o);
+  document.getElementById('apm-num').textContent=m?String(parseInt(m[1])).padStart(2,'0'):'—';
+  document.getElementById('apm-title').textContent=o+(g('lokacija')?' · '+g('lokacija'):'');
+  document.getElementById('apm-stat').textContent=g('status')||'Aktivan';
+}
+function saveAparat(){
+  const rec={};AP_FIELDS.forEach(([,rows])=>rows.forEach(([k])=>{const e=document.getElementById('apf-'+k);rec[k]=e?e.value.trim():'';}));
+  if(!rec.oznaka){toast('Upišite oznaku aparata.','warn');return;}
+  if(apList().some(x=>x.oznaka.toLowerCase()===rec.oznaka.toLowerCase()&&x.id!==eApId)){toast('Oznaka '+rec.oznaka+' već postoji.','warn');return;}
+  if(!rec.lokacija){toast('Upišite naziv lokacije.','warn');return;}
+  if(eApId){const a=getAp(eApId);Object.assign(a,rec);
+    D.prodaja.forEach(p=>{if(p.aparat_id===a.id)p.kanal=apLabel(a)+(String(p.kanal||'').includes('(auto)')?' (auto)':'');});
+    D.fakture.forEach(f=>{if(f.aparat_id===a.id)f.grad=apLok(a);});
+    D.stroj.forEach(e=>{if(e.aparat_id===a.id)e.stroj=apLok(a);});
+    toast('Aparat '+rec.oznaka+' spremljen.');}
+  else{rec.id='ap_'+uid();D.aparati.push(rec);
+    const pk=document.getElementById('prod-kanal');if(pk)pk.value=rec.id;
+    toast('Aparat '+rec.oznaka+' dodan.');}
+  D.povijest.push({dt:now(),vrsta:eApId?'Aparat izmijenjen':'Novi aparat',artikl:rec.oznaka,kolicina:'—',ref:rec.lokacija,grad:rec.grad});
+  closeMo('mo-ap');renderAll();
+  const pk=document.getElementById('prod-kanal');if(pk&&!eApId){pk.value=D.aparati[D.aparati.length-1].id;}
+}
+function delAparat(){
+  if(!eApId)return;const a=getAp(eApId);
+  const n=D.prodaja.filter(p=>p.aparat_id===eApId).length;
+  const nf=D.fakture.filter(f=>f.aparat_id===eApId).length+D.stroj.filter(x=>x.aparat_id===eApId).length;
+  if(n||nf){toast('Aparat ima '+(n+nf)+' zapisa (prodaja, fakture, otpisi) — ne može se obrisati. Postavite status "Neaktivan".','warn');return;}
+  if(apList().length<=1){toast('Mora postojati barem jedan aparat.','warn');return;}
+  if(!confirm('Obrisati aparat '+a.oznaka+'?'))return;
+  D.aparati=D.aparati.filter(x=>x.id!==eApId);if(AP_SEL===eApId)AP_SEL='all';
+  closeMo('mo-ap');renderAll();toast('Aparat obrisan.','warn');
+}
+
+/* ── statistika ── */
+function apStats(list){
+  const byDay={},byMonth={};let tot=0,kom=0;
+  list.forEach(p=>{const v=prihodOf(p);tot+=v;kom+=Number(p.kom)||0;const d=p.datum||'';if(!d)return;
+    byDay[d]=(byDay[d]||0)+v;const m=d.slice(0,7);byMonth[m]=(byMonth[m]||0)+v;});
+  const days=Object.keys(byDay).filter(d=>byDay[d]>0);
+  let bestD=null,bestM=null;
+  days.forEach(d=>{if(!bestD||byDay[d]>byDay[bestD])bestD=d;});
+  Object.keys(byMonth).forEach(m=>{if(!bestM||byMonth[m]>byMonth[bestM])bestM=m;});
+  return {tot,kom,byDay,byMonth,days:days.length,avg:days.length?tot/days.length:0,bestD,bestM,
+    last:list.reduce((m,p)=>(p.datum||'')>m?p.datum:m,'')};
+}
+function kpiCard(ic,cls,lab,val,sub){return '<div class="kpi"><div class="kpi-top">'+apIco(ic,cls)+lab+'</div><div class="kpi-v">'+val+'</div>'+(sub?'<div class="kpi-s">'+sub+'</div>':'')+'</div>';}
+
+let _chAp=null,_chPh=null;
+function barChart(canvasId,prev,labels,data,titleCb){
+  const cv=document.getElementById(canvasId);if(!cv||typeof Chart==='undefined')return prev;
+  if(prev){try{prev.destroy();}catch(e){}}
+  const isDark=document.body.classList.contains('dark');
+  const ctx=cv.getContext('2d');const gr=ctx.createLinearGradient(0,0,0,cv.clientHeight||260);
+  gr.addColorStop(0,'#30D158');gr.addColorStop(1,'rgba(48,209,88,.35)');
+  return new Chart(cv,{type:'bar',data:{labels,datasets:[{data,backgroundColor:gr,hoverBackgroundColor:'#30D158',borderRadius:8,borderSkipped:false,maxBarThickness:38}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{backgroundColor:isDark?'#2C2C2E':'#111827',padding:10,cornerRadius:10,displayColors:false,
+        callbacks:{title:titleCb||(i=>i[0].label),label:i=>eur(i.parsed.y)}}},
+      scales:{x:{grid:{display:false},ticks:{color:isDark?'#8E8E93':'#6B7280',font:{size:11}}},
+        y:{beginAtZero:true,grid:{color:isDark?'#2C2C2E':'#EEF0F3'},border:{display:false},ticks:{color:isDark?'#8E8E93':'#6B7280',font:{size:11},callback:v=>v+' €'}}}}});
+}
+
+/* ── nadzorna ploča: panel aparata ── */
+function renderApPanel(){
+  const box=document.getElementById('ap-panel');if(!box)return;
+  const tdy=td(),mj=tdy.slice(0,7);
+  const a=getAp(AP_SEL);
+  if(!a){
+    box.innerHTML='<div class="ap-strip">'+apList().map(x=>{
+      const L=D.prodaja.filter(p=>p.aparat_id===x.id);
+      const dn=L.filter(p=>p.datum===tdy).reduce((s,p)=>s+prihodOf(p),0);
+      const mm=L.filter(p=>(p.datum||'').startsWith(mj)).reduce((s,p)=>s+prihodOf(p),0);
+      return '<div class="ap-chip" onclick="setApSel(\''+x.id+'\')"><b>'+escA(x.oznaka)+'</b> <span>'+escA(x.lokacija||'')+'</span><em>'+eur(mm)+'</em><span>ovaj mjesec · danas '+eur(dn)+'</span></div>';
+    }).join('')+'<div class="ap-chip" onclick="openApModal()" style="display:flex;align-items:center;justify-content:center;color:var(--ap-blue);font-weight:700">＋ Novi aparat</div></div>';
+    return;
+  }
+  const L=D.prodaja.filter(p=>p.aparat_id===a.id);
+  const st=apStats(L);
+  const dn=L.filter(p=>p.datum===tdy);const mL=L.filter(p=>(p.datum||'').startsWith(mj));
+  const sum=l=>l.reduce((s,p)=>s+prihodOf(p),0),kom=l=>l.reduce((s,p)=>s+(Number(p.kom)||0),0);
+  box.innerHTML='<div class="ap-head" style="cursor:pointer" onclick="openApModal(\''+a.id+'\')"><div class="ap-num">'+apNum(a)+'</div><div><div class="ap-head-l">Aparat</div><div class="ap-head-t">'+escA(apLabel(a))+'</div>'+
+    '<div class="ap-head-s">'+escA([a.prostor,a.adresaLok||a.adresa].filter(Boolean).join(', '))+(a.zadnjiServis?' · servis '+hrDatKr(a.zadnjiServis):'')+'</div></div><div class="ap-status">'+escA(a.status||'Aktivan')+'</div></div>'+
+    '<div class="kpi-grid">'+
+      kpiCard('eur','g','Danas',eur(sum(dn)),kom(dn)+' napitaka')+
+      kpiCard('cal','b','Ovaj mjesec',eur(sum(mL)),kom(mL)+' napitaka')+
+      kpiCard('bars','p','Ukupno',eur(st.tot),st.kom+' napitaka · '+st.days+' dana')+
+      kpiCard('sun','o','Zadnja prodaja',st.last?hrDatKr(st.last):'—',st.bestD?'najbolji dan '+eur(st.byDay[st.bestD]):'')+
+    '</div><div class="card"><div class="ct"><div class="ctl">Prihod — zadnjih 30 dana</div><button class="btn bs bsm" onclick="gv(\'prihodi\')">Svi prihodi</button></div><div style="height:220px;position:relative"><canvas id="ap-chart30"></canvas></div></div>';
+  const labels=[],data=[],keys=[];
+  for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toISOString().slice(0,10);keys.push(k);labels.push(d.getDate()+'.'+(d.getMonth()+1)+'.');data.push(+(st.byDay[k]||0).toFixed(2));}
+  _chAp=barChart('ap-chart30',_chAp,labels,data,i=>hrDat(keys[i[0].dataIndex]));
+}
+
+/* ── prihodi ── */
+function renderPrihodi(){
+  const gs=document.getElementById('ph-god'),ps=document.getElementById('ph-per');if(!gs)return;
+  const base=prodOfAp(D.prodaja);
+  const years=[...new Set(D.prodaja.map(p=>(p.datum||'').slice(0,4)).filter(Boolean))].sort().reverse();
+  if(!years.length)years.push(td().slice(0,4));
+  const gCur=gs.value&&years.includes(gs.value)?gs.value:years[0];
+  gs.innerHTML=years.map(y=>'<option'+(y===gCur?' selected':'')+'>'+y+'</option>').join('');
+  const god=gCur;
+  const mjs=[...new Set(base.filter(p=>(p.datum||'').startsWith(god)).map(p=>p.datum.slice(5,7)))].sort();
+  const pCur=ps.value&&(ps.value==='all'||mjs.includes(ps.value))?ps.value:'all';
+  ps.innerHTML='<option value="all">Cijela godina '+god+'.</option>'+mjs.map(m=>'<option value="'+m+'"'+(m===pCur?' selected':'')+'>'+MJ_NAZ[parseInt(m)-1]+' '+god+'.</option>').join('');
+  const per=pCur;
+  const yearL=base.filter(p=>(p.datum||'').startsWith(god));
+  const L=per==='all'?yearL:yearL.filter(p=>p.datum.slice(5,7)===per);
+  const st=apStats(L);const a=getAp(AP_SEL);
+  document.getElementById('ph-sub').textContent=(per==='all'?'Cijela godina '+god+'.':MJ_NAZ[parseInt(per)-1]+' '+god+'.')+' · '+L.length+' unosa · '+(a?apLabel(a):'svi aparati');
+  const bd=st.bestD?new Date(st.bestD+'T12:00:00'):null;
+  document.getElementById('ph-kpi').innerHTML=
+    kpiCard('eur','g',per==='all'?'Ukupno u godini':'Ukupno u mjesecu',eur(st.tot),st.kom+' napitaka')+
+    kpiCard('bars','b','Prosjek po danu',eur(st.avg),st.days+' dana s prometom')+
+    kpiCard('sun','o','Najbolji dan',st.bestD?eur(st.byDay[st.bestD]):'—',bd?DAN_NAZ[bd.getDay()]+', '+hrDat(st.bestD):'')+
+    kpiCard('cal','p','Najbolji mjesec',st.bestM?eur(st.byMonth[st.bestM]):'—',st.bestM?MJ_NAZ[parseInt(st.bestM.slice(5))-1]+' '+st.bestM.slice(0,4)+'.':'');
+  let labels=[],data=[],tcb=null;
+  if(per==='all'){
+    const ys=apStats(yearL);
+    for(let m=1;m<=12;m++){const k=god+'-'+String(m).padStart(2,'0');labels.push(MJ_NAZ[m-1].slice(0,3));data.push(+(ys.byMonth[k]||0).toFixed(2));}
+    tcb=i=>MJ_NAZ[i[0].dataIndex]+' '+god+'.';
+    document.getElementById('ph-ch-t').textContent='Mjesečni prihod';document.getElementById('ph-ch-s').textContent='Cijela godina '+god+'.';
+  } else {
+    const nd=new Date(+god,+per,0).getDate();const keys=[];
+    for(let d=1;d<=nd;d++){const k=god+'-'+per+'-'+String(d).padStart(2,'0');keys.push(k);labels.push(String(d));data.push(+(st.byDay[k]||0).toFixed(2));}
+    tcb=i=>hrDat(keys[i[0].dataIndex]);
+    document.getElementById('ph-ch-t').textContent='Dnevni prihod';document.getElementById('ph-ch-s').textContent=MJ_NAZ[parseInt(per)-1]+' '+god+'.';
+  }
+  _chPh=barChart('ph-chart',_chPh,labels,data,tcb);
+  // po okusu
+  const ok={};L.forEach(p=>{const k=p.okus||'—';ok[k]=ok[k]||{v:0,k:0};ok[k].v+=prihodOf(p);ok[k].k+=Number(p.kom)||0;});
+  const okL=Object.entries(ok).sort((x,y)=>y[1].v-x[1].v);const mx=okL.length?okL[0][1].v:1;
+  document.getElementById('ph-okus').innerHTML=okL.length?okL.map(([n,o])=>'<div class="ph-list-row"><span style="width:10px;height:10px;border-radius:3px;background:'+flavorChart(n)+'"></span><span style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escA(n)+'</span><div class="ph-bar"><i style="width:'+Math.round(o.v/mx*100)+'%;background:'+flavorChart(n)+'"></i></div><strong style="min-width:84px;text-align:right">'+eur(o.v)+'</strong><span style="color:var(--tx2);min-width:52px;text-align:right">'+o.k+' kom</span></div>').join(''):'<div class="empty" style="padding:16px"><p>Nema prodaje u odabranom razdoblju.</p></div>';
+  // po aparatu (uvijek svi, isto razdoblje)
+  const allY=D.prodaja.filter(p=>(p.datum||'').startsWith(god)&&(per==='all'||p.datum.slice(5,7)===per));
+  const byA=apList().map(x=>({a:x,v:allY.filter(p=>p.aparat_id===x.id).reduce((s,p)=>s+prihodOf(p),0)})).sort((x,y)=>y.v-x.v);
+  const mA=byA.length&&byA[0].v?byA[0].v:1;
+  document.getElementById('ph-apar').innerHTML=byA.map(o=>'<div class="ph-list-row" style="cursor:pointer" onclick="setApSel(\''+o.a.id+'\')">'+apIco('box','o')+'<span style="width:150px"><b>'+escA(o.a.oznaka)+'</b><br><span style="color:var(--tx2);font-size:12px">'+escA(o.a.lokacija||'')+'</span></span><div class="ph-bar"><i style="width:'+Math.round(o.v/mA*100)+'%;background:var(--ap-blue)"></i></div><strong style="min-width:84px;text-align:right">'+eur(o.v)+'</strong></div>').join('');
+}
+
+/* ── popis aparata ── */
+function renderAparati(){
+  const g=document.getElementById('ap-grid');if(!g)return;
+  const tdy=td(),mj=tdy.slice(0,7);
+  document.getElementById('ap-sub').textContent=apList().length+' '+(apList().length===1?'aparat':'aparata')+' · sljedeća oznaka '+nextOznaka();
+  g.innerHTML=apList().map(a=>{
+    const L=D.prodaja.filter(p=>p.aparat_id===a.id);
+    const s=l=>eur(l.reduce((x,p)=>x+prihodOf(p),0));
+    return '<div class="ap-card" onclick="setApSel(\''+a.id+'\');gv(\'dashboard\')"><div class="ap-head"><div class="ap-num">'+apNum(a)+'</div><div style="min-width:0"><div class="ap-head-t">'+escA(a.oznaka)+'</div><div class="ap-head-s"><b>'+escA(a.lokacija||'')+'</b> · '+escA(a.grad||'')+'</div></div><div class="ap-status">'+escA(a.status||'Aktivan')+'</div></div>'+
+      '<div class="ap-card-b"><div>Danas<strong>'+s(L.filter(p=>p.datum===tdy))+'</strong></div><div>Mjesec<strong>'+s(L.filter(p=>(p.datum||'').startsWith(mj)))+'</strong></div><div>Ukupno<strong>'+s(L)+'</strong></div></div>'+
+      '<div class="ap-card-f"><button class="btn bs bsm" onclick="event.stopPropagation();openApModal(\''+a.id+'\')">Uredi podatke</button><button class="btn bs bsm" onclick="event.stopPropagation();setApSel(\''+a.id+'\');gv(\'prihodi\')">Prihodi</button></div></div>';
+  }).join('')+'<div class="ap-card ap-card-new" onclick="openApModal()"><span style="font-size:30px;line-height:1">＋</span>Novi aparat · '+nextOznaka()+'</div>';
+}
+
+/* ── mobilna navigacija ── */
+function updTab(id){document.querySelectorAll('.mtab button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===id));}
+function novaProdaja(){
+  if(typeof rstProdaja==='function')rstProdaja();
+  gv('prodaja');
+  const pk=document.getElementById('prod-kanal');if(pk)pk.value=apDefaultId();
+  setTimeout(()=>{window.scrollTo({top:0,behavior:'smooth'});const s=document.getElementById('prod-art');if(s)s.focus();},60);
+}
+
+/* ── odabir aparata za Excel uvoz ── */
+function pickApForImport(stroj,cb){
+  const L=document.getElementById('aps-list');
+  document.getElementById('aps-eye').textContent='UVOZ EXCELA';
+  document.getElementById('aps-title').textContent='Za koji aparat?';
+  window._apPickCb=id=>{closeMo('mo-apsel');document.getElementById('aps-eye').textContent='PRIKAZ';document.getElementById('aps-title').textContent='Odaberi aparat';cb(id);};
+  L.innerHTML=(stroj?'<div style="padding:12px 14px;font-size:13px;color:var(--tx2)">Stroj u datoteci: <b style="color:var(--tx)">'+escA(stroj)+'</b>. Odabrani aparat zapamtit će ovaj broj za sljedeće uvoze.</div>':'')+
+    apList().map(a=>'<div class="apsel-row" onclick="_apPickCb(\''+a.id+'\')">'+apIco('box','o')+'<div><b>'+escA(apLabel(a))+'</b><span>'+escA(a.adresaLok||a.adresa||'')+'</span></div></div>').join('');
+  openMo('mo-apsel');
+}
+
+
+/* ── zalihe i prikaz po aparatu ── */
+function stockAp(apId){
+  const ul={},out={};
+  D.fakture.forEach(f=>{ if(f.aparat_id!==apId) return; (f.stavke||[]).forEach(st=>{
+    let g=parseFloat(st.kolicina)||0; if(st.jedinica==='pakiranje') g*=G_PO_PAKIRANJU; else if(st.jedinica==='kg') g*=1000;
+    ul[st.okus||'']=(ul[st.okus||'']||0)+g; }); });
+  D.prodaja.forEach(e=>{ if(e.aparat_id===apId) ul[e.okus||'']=(ul[e.okus||'']||0)-(parseFloat(e.potrebnoG)||0); });
+  D.stroj.forEach(e=>{ if(e.aparat_id!==apId) return; const pr=gp(e.artikl_id||''); const ok=pr?(pr.flavor||''):''; ul[ok]=(ul[ok]||0)-(parseFloat(e.kolicina)||0); });
+  D.products.forEach(pr=>{ out[pr.id]=Math.max(0,Math.round(ul[pr.flavor||'']||0)); });
+  return out;
+}
+var _apDepth=0;
+function withApView(fn, apId){
+  const id = apId===undefined ? AP_SEL : apId;
+  if(_apDepth>0 || !id || id==='all' || !getAp(id)) return fn();
+  const keep={f:D.fakture,s:D.stroj,p:D.prodaja,pv:D.povijest,st:D.products.map(x=>x.stock),ci:D.products.map(x=>x.city),le:D.products.map(x=>x.lastEntry)};
+  const map=stockAp(id), ap=getAp(id);
+  const last={}; keep.f.forEach(f=>{ if(f.aparat_id!==id) return; (f.stavke||[]).forEach(st=>{ const k=st.okus||''; if(!last[k]||(f.datum||'')>last[k]) last[k]=f.datum; }); });
+  _apDepth++;
+  try{
+    D.fakture=keep.f.filter(x=>x.aparat_id===id);
+    D.stroj=keep.s.filter(x=>x.aparat_id===id);
+    D.prodaja=keep.p.filter(x=>x.aparat_id===id);
+    D.povijest=keep.pv.filter(x=>x.aparat_id===id);
+    D.products.forEach(x=>{x.stock=map[x.id]||0; x.city=apLok(ap); x.lastEntry=last[x.flavor||'']||'—';});
+    return fn();
+  } finally {
+    D.fakture=keep.f; D.stroj=keep.s; D.prodaja=keep.p; D.povijest=keep.pv;
+    D.products.forEach((x,i)=>{x.stock=keep.st[i]; x.city=keep.ci[i]; x.lastEntry=keep.le[i];});
+    _apDepth--;
+  }
+}
+function apWrap(f){ return function(){ const a=arguments, t=this; return withApView(()=>f.apply(t,a)); }; }
+renderDb=apWrap(renderDb); renderFak=apWrap(renderFak); renderStr=apWrap(renderStr); renderNrm=apWrap(renderNrm);
+renderStan=apWrap(renderStan); renderArti=apWrap(renderArti); renderProdaja=apWrap(renderProdaja);
+renderCharts=apWrap(renderCharts); updCrit=apWrap(updCrit); renderPov=apWrap(renderPov);
+if(typeof buildExcelData==='function') buildExcelData=apWrap(buildExcelData);
+(function(){ const _pl=prodLiveCalc; prodLiveCalc=function(){ const el=document.getElementById('prod-kanal'); return withApView(()=>_pl(), el&&getAp(el.value)?el.value:'all'); };
+  const _lv=lv; lv=function(){ const el=document.getElementById('sstrj'); return withApView(()=>_lv(), el&&getAp(el.value)?el.value:'all'); }; })();
+
 /* ── CFG (postavke) ── */
 const CFG_DEFAULT = {
   company:'Perla Notte d.o.o.', oib:'', addr:'', email:'', tel:'',
@@ -2498,7 +3052,9 @@ function saveCFG(){
 
 /* ── DATA (sve transakcije) ── */
 function saveData(){
+  if(typeof _apDepth!=='undefined' && _apDepth>0) return;
   const toSave = {
+    aparati:    D.aparati||[],
     products:   D.products,
     fakture:    D.fakture,
     stroj:      D.stroj,
@@ -2530,6 +3086,7 @@ function loadAll(callback){
         if(p.povijest)                               D.povijest    = p.povijest;
         if(p.dobavljaci && p.dobavljaci.length > 0)  D.dobavljaci  = p.dobavljaci;
         if(p.ops && p.ops.length > 0) D.ops = p.ops;
+        if(Array.isArray(p.aparati) && p.aparati.length) D.aparati = p.aparati;
         // Ukloni stara predefinirana imena koja nisu stvarni operateri tvrtke
         const staraImena=['Marko Horvat','Ivana Perić','Tomislav Kovač','Ana Blažević','Josip Šimić'];
         D.ops = D.ops.filter(o => !staraImena.includes(o));
@@ -2591,7 +3148,7 @@ function loadAll(callback){
         idbSet(KEY_DATA, JSON.stringify({
           products:D.products,fakture:D.fakture,stroj:D.stroj,
           prodaja:D.prodaja||[],normativi:D.normativi,povijest:D.povijest,
-          dobavljaci:D.dobavljaci,ops:D.ops
+          dobavljaci:D.dobavljaci,ops:D.ops,aparati:D.aparati||[]
         }));
         if(Number(migVer||0) < CURRENT_MIG){
           console.log('✅ Migracija v'+CURRENT_MIG+' — artikli konvertirani u grame');
@@ -2646,7 +3203,9 @@ function saveProdaja(){
   const kom=parseInt(document.getElementById('prod-kom').value)||0;
   const dat=document.getElementById('prod-dat').value;
   const op=document.getElementById('prod-op').value;
-  const kanal=document.getElementById('prod-kanal').value;
+  const apId=document.getElementById('prod-kanal').value; const apO=getAp(apId);
+  if(!apO){toast('Odaberite aparat!','warn');return;}
+  const kanal=apLabel(apO);
   const cij=parseFloat(document.getElementById('prod-cij').value)||0;
   const nap=document.getElementById('prod-nap').value;
   if(!artId||kom<=0){toast('Odaberite okus i unesite količinu!','warn');return;}
@@ -2663,18 +3222,18 @@ function saveProdaja(){
       toast(`Nedovoljno! Ima ${prod.stock.toFixed(0)}g = ${Math.floor(prod.stock/GRAMA_PO_NAPITKU)} napitaka`,'err');return;
     }
     prod.stock-=potrebnoG;
-    D.prodaja=D.prodaja.map(x=>x.id===eProdId?{...x,artikl_id:artId,artikl:prod.name,okus:prod.flavor,kom,potrebnoG,stockPoslije:prod.stock,cij,ukupno:(kom*cij).toFixed(2),datum:dat,operater:op,kanal,nap}:x);
+    D.prodaja=D.prodaja.map(x=>x.id===eProdId?{...x,artikl_id:artId,artikl:prod.name,okus:prod.flavor,kom,potrebnoG,stockPoslije:prod.stock,cij,ukupno:(kom*cij).toFixed(2),datum:dat,operater:op,kanal,aparat_id:apId,nap}:x);
     eProdId=null;
     toast(`✅ Prodaja ažurirana — ${kom} napitaka (${potrebnoG}g)`);
   } else {
     // NOVI ZAPIS
-    if(prod.stock<potrebnoG){toast(`Nedovoljno! Ima ${prod.stock.toFixed(0)}g = ${Math.floor(prod.stock/GRAMA_PO_NAPITKU)} napitaka`,'err');return;}
+    { const imaAp=stockAp(apId)[artId]||0; if(imaAp<potrebnoG){toast('Nedovoljno na '+apO.oznaka+'! Ima '+imaAp.toFixed(0)+'g = '+Math.floor(imaAp/GRAMA_PO_NAPITKU)+' napitaka. Unesite fakturu za ovu lokaciju.','err');return;} }
     const stockPrije=prod.stock;
     prod.stock-=potrebnoG;prod.lastEntry=dat;
-    D.prodaja.push({id:uid(),artikl_id:artId,artikl:prod.name,okus:prod.flavor,kom,potrebnoG,stockPrije,stockPoslije:prod.stock,cij,ukupno:(kom*cij).toFixed(2),datum:dat,operater:op,kanal,nap});
+    D.prodaja.push({id:uid(),artikl_id:artId,artikl:prod.name,okus:prod.flavor,kom,potrebnoG,stockPrije,stockPoslije:prod.stock,cij,ukupno:(kom*cij).toFixed(2),datum:dat,operater:op,kanal,aparat_id:apId,nap});
     D.povijest.push({dt:now(),vrsta:'Prodaja',artikl:prod.flavor,kolicina:`-${potrebnoG}g (${kom} nap.)`,ref:kanal,grad:prod.city});
-    if(document.getElementById('setsp')?.checked)showSp('prod',[artId]);
-    toast(`✅ Prodano ${kom} napitaka (${potrebnoG}g) — ostalo ${prod.stock.toFixed(0)}g = ${Math.floor(prod.stock/GRAMA_PO_NAPITKU)} napitaka`);
+    if(document.getElementById('setsp')?.checked)withApView(()=>showSp('prod',[artId]), apId);
+    { const ost=(stockAp(apId)[artId]||0); toast(`✅ ${apO.oznaka}: prodano ${kom} napitaka (${potrebnoG}g) — ostalo ${ost.toFixed(0)}g = ${Math.floor(ost/GRAMA_PO_NAPITKU)} napitaka`); }
   }
   rstProdaja();renderAll();
 }
@@ -2867,8 +3426,9 @@ function getProdFilter(){
 
 function getProdFiltered(){
   const filter=getProdFilter();
-  if(!filter) return D.prodaja;
-  return D.prodaja.filter(e=>(e.datum||'').startsWith(filter));
+  const base=prodOfAp(D.prodaja);
+  if(!filter) return base;
+  return base.filter(e=>(e.datum||'').startsWith(filter));
 }
 
 function getMjesecNaziv(ym){
@@ -2904,86 +3464,53 @@ function importPnExcel(input){
       const wb = XLSX.read(e.target.result, {type:'binary'});
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
-
-      // Red 2 (index 1) sadrži datum: Start Time = col 0
-      const datum = rows[1] && rows[1][0] ? String(rows[1][0]).trim().slice(0,10) : new Date().toISOString().slice(0,10);
-
-      // Provjeri je li taj datum već uvezen
-      const vecPostoji = D.prodaja.some(p => p.datum === datum && p.kanal === 'Fitness centar (auto)');
-      if(vecPostoji){
-        if(!confirm(`Prodaja za ${datum} je već uvezena!\nŽeliš li uvesti ponovo (duplikat)?`)) {
-          input.value=''; return;
-        }
-      }
-
-      // Redci s podacima počinju od reda 4 (index 3)
-      // Struktura: Goods Name | Machine Number | Machine Name | Merchant Name | Number Of Completed Orders | Transaction Amount
-      let uvezeno = 0;
-      let preskoceno = 0;
-      const greske = [];
-
-      for(let i=3; i<rows.length; i++){
-        const row = rows[i];
-        if(!row || !row[0]) continue;
-        const rawName = String(row[0]).trim();
-        const okusKey = rawName.toLowerCase();
-        const okus = PN_NAME_MAP[okusKey];
-
-        if(!okus){
-          greske.push(rawName);
-          preskoceno++;
-          continue;
-        }
-
-        const kom = parseInt(row[4]) || 0;
-        const iznos = parseFloat(row[5]) || 0;
-        if(kom <= 0) continue;
-
-        // Pronađi artikl
-        const prod = D.products.find(p => p.flavor === okus);
-        if(!prod){ greske.push(`Artikl nije pronađen: ${okus}`); preskoceno++; continue; }
-
-        const potrebnoG = kom * GRAMA_PO_NAPITKU;
-        const cij = kom > 0 ? parseFloat((iznos/kom).toFixed(2)) : 2.70;
-
-        // Oduzmi sa zalihe
-        prod.stock = Math.max(0, (prod.stock||0) - potrebnoG);
-        prod.lastEntry = datum;
-
-        // Dodaj u prodaju
-        D.prodaja.push({
-          id: uid(),
-          artikl_id: prod.id,
-          artikl: prod.name,
-          okus,
-          kom,
-          potrebnoG,
-          stockPoslije: prod.stock,
-          cij,
-          ukupno: iznos.toFixed(2),
-          datum,
-          kanal: 'Fitness centar (auto)',
-          operater: 'Fitness centar',
-          nap: `Perla Notte uvoz — ${file.name}`
-        });
-        uvezeno++;
-      }
-
-      saveData();
-      renderAll();
-      input.value='';
-
-      let msg = `✅ Uvezeno ${uvezeno} artikala za ${datum}`;
-      if(preskoceno > 0) msg += `\n⚠️ Preskočeno ${preskoceno}: ${greske.join(', ')}`;
-      if(greske.length > 0) toast(msg, 'warn');
-      else toast(msg);
-
+      const datum = rows[1] && rows[1][0] ? String(rows[1][0]).trim().slice(0,10) : td();
+      // Stupci: Goods Name | Machine Number | Machine Name | Merchant | Orders | Amount
+      let stroj='', strojIme='';
+      for(let i=3;i<rows.length;i++){ const r=rows[i]; if(r&&r[0]&&r[1]){ stroj=String(r[1]).trim(); strojIme=r[2]?String(r[2]).trim():''; break; } }
+      const go = apId => { pnImportRows(rows, datum, file, apId, stroj); input.value=''; };
+      const hit = stroj ? apList().find(a=>String(a.strojBroj||'').trim()===stroj || String(a.serijski||'').trim()===stroj) : null;
+      if(hit) return go(hit.id);
+      if(apList().length===1) return go(apList()[0].id);
+      pickApForImport(stroj ? stroj+(strojIme?' ('+strojIme+')':'') : '', go);
     } catch(err){
       toast('❌ Greška pri uvozu: '+err.message, 'err');
       console.error(err);
     }
   };
   reader.readAsBinaryString(file);
+}
+
+function pnImportRows(rows, datum, file, apId, stroj){
+  const ap = getAp(apId); if(!ap){ toast('Aparat nije pronađen.','err'); return; }
+  if(stroj && !ap.strojBroj) ap.strojBroj = stroj;
+  const vecPostoji = D.prodaja.some(p => p.datum === datum && p.aparat_id === apId && String(p.kanal||'').includes('(auto)'));
+  if(vecPostoji && !confirm('Prodaja za '+datum+' ('+ap.oznaka+') je već uvezena!\nŽeliš li uvesti ponovo (duplikat)?')) return;
+  let uvezeno=0, preskoceno=0; const greske=[];
+  for(let i=3; i<rows.length; i++){
+    const row = rows[i];
+    if(!row || !row[0]) continue;
+    const rawName = String(row[0]).trim();
+    const okus = PN_NAME_MAP[rawName.toLowerCase()];
+    if(!okus){ greske.push(rawName); preskoceno++; continue; }
+    const kom = parseInt(row[4]) || 0;
+    const iznos = parseFloat(row[5]) || 0;
+    if(kom <= 0) continue;
+    const prod = D.products.find(p => p.flavor === okus);
+    if(!prod){ greske.push('Artikl nije pronađen: '+okus); preskoceno++; continue; }
+    const potrebnoG = kom * GRAMA_PO_NAPITKU;
+    const cij = kom > 0 ? parseFloat((iznos/kom).toFixed(2)) : 2.70;
+    prod.stock = Math.max(0, (prod.stock||0) - potrebnoG);
+    prod.lastEntry = datum;
+    D.prodaja.push({ id:uid(), artikl_id:prod.id, artikl:prod.name, okus, kom, potrebnoG, stockPoslije:prod.stock, cij,
+      ukupno:iznos.toFixed(2), datum, kanal:apLabel(ap)+' (auto)', aparat_id:ap.id, operater:ap.lokacija||'Aparat',
+      nap:'Perla Notte uvoz — '+file.name });
+    uvezeno++;
+  }
+  saveData(); renderAll();
+  let msg = '✅ '+ap.oznaka+': uvezeno '+uvezeno+' artikala za '+hrDatKr(datum);
+  if(preskoceno > 0) msg += ' · preskočeno '+preskoceno+': '+greske.join(', ');
+  toast(msg, greske.length ? 'warn' : 'ok');
 }
 
 function toggleProdGroup(gid){
@@ -3364,7 +3891,7 @@ function renderCharts(){
   }
 }
 
-function renderAll(){updSels();renderDb();renderFak();renderStr();renderNrm();renderStan();renderArti();renderDob();renderPov();renderProdaja();updCrit();updDl();updFakDobSel();saveData();renderCharts();}
+function renderAll(){ensureAparati();updSels();renderDb();renderFak();renderStr();renderNrm();renderStan();renderArti();renderDob();renderPov();renderProdaja();updCrit();updDl();updFakDobSel();updApUI();renderApPanel();renderPrihodi();renderAparati();saveData();renderCharts();}
 function updSels(){
   ['sart','nart'].forEach(id=>{
     const sel=document.getElementById(id);if(!sel)return;
@@ -3445,6 +3972,7 @@ function renderFak(){
           <span style="height:14px;width:1px;background:var(--br);display:inline-block"></span>
           <span style="font-size:12px;color:var(--tx2)">${datum}</span>
           <span style="font-size:12px;color:var(--tx2)">${dob}</span>
+          <span style="font-size:11.5px;font-weight:600;color:var(--ap-blue);background:rgba(10,132,255,.12);padding:2px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${grad||'—'}</span>
           <span style="font-size:12px;font-weight:600;color:var(--teal)">${ukupnoKol.toFixed(2)} pak.</span>
           <span style="height:14px;width:1px;background:var(--br);display:inline-block"></span>
           ${badges}${more}
@@ -3686,11 +4214,10 @@ function renderPov(){
   }
   // Grupiraj po datumu (samo datum, bez vremena)
   const grouped={};
-  D.povijest.slice().reverse().forEach(e=>{
-    const day=e.dt?e.dt.split(' ')[0]:'—';
-    if(!grouped[day])grouped[day]=[];
-    grouped[day].push(e);
-  });
+  const povKey=e=>{const m=/(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/.exec(e.dt||'');return m?m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'):'0000-00-00';};
+  const tmp={};
+  D.povijest.slice().reverse().forEach(e=>{const k=povKey(e);(tmp[k]=tmp[k]||[]).push(e);});
+  Object.keys(tmp).sort().reverse().forEach(k=>{const lab=k==='0000-00-00'?'—':(k.slice(8)+'.'+k.slice(5,7)+'.'+k.slice(0,4)+'.');grouped[lab]=tmp[k];});
   const vrstaColor=v=>v.includes('faktura')||v.includes('Ulaz')?'bG':v.includes('Prodaja')?'bBl':v.includes('stroj')||v.includes('Stroj')?'bO':'bN';
   const kolColor=k=>k&&k.startsWith('+')?'var(--green)':'var(--orange)';
 
@@ -4022,6 +4549,8 @@ function impAll(inp){
       if(d.products   && d.products.length   > 0) D.products   = d.products;
       if(d.fakture)    D.fakture   = d.fakture;
       if(d.stroj)      D.stroj     = d.stroj;
+      if(d.prodaja)    D.prodaja   = d.prodaja;
+      if(Array.isArray(d.aparati) && d.aparati.length) D.aparati = d.aparati;
       if(d.normativi)  D.normativi = d.normativi;
       if(d.povijest)   D.povijest  = d.povijest;
       if(d.dobavljaci && d.dobavljaci.length > 0) D.dobavljaci = d.dobavljaci;
@@ -4130,7 +4659,7 @@ function clearAll(){
 }
 </script>
 <script>
-if('serviceWorker' in navigator){
+if('serviceWorker' in navigator && !TEST_MODE && location.protocol.indexOf('http')===0){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('./sw.js')
       .then(r=>console.log('SW OK:',r.scope))
