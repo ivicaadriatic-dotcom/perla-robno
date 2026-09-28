@@ -247,7 +247,7 @@ tbody tr:hover td{background:#F9FAFB}
 
 /* ═══ BADGES ═══ */
 .b{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
-.bG{background:#D1FAE5;color:#065F46}.bO{background:#FEF3C7;color:#78350F}.bR{background:#FEE2E2;color:#991B1B}.bBl{background:#DBEAFE;color:#1E40AF}.bN{background:#F3F4F6;color:#4B5563}
+.bG{background:#D1FAE5;color:#065F46}.bO{background:#FEF3C7;color:#78350F}.bR{background:#FEE2E2;color:#991B1B}.bM{background:#FFE4E1;color:#B91C1C;border:1px solid rgba(255,59,48,.45)}.gneg{color:#FF3B30!important;font-weight:800;letter-spacing:-.2px}body.dark .gneg{color:#FF6961!important}body.dark .bM{background:rgba(255,59,48,.18);color:#FF8A80}.bBl{background:#DBEAFE;color:#1E40AF}.bN{background:#F3F4F6;color:#4B5563}
 
 /* ═══ STOCK BAR ═══ */
 .sbar{height:4px;background:var(--br);border-radius:4px;overflow:hidden;margin-top:4px;width:80px}
@@ -507,6 +507,17 @@ body.dark{--grp:#232326;--inp:#2C2C2E}
   .apbox{max-width:100%!important;border-radius:22px 22px 0 0!important;max-height:94vh}
   .aprow input,.aprow select{width:56%}
   .hero{display:none!important}
+}
+@media(max-width:600px){
+  #stantbl th:nth-child(1),#stantbl td:nth-child(1),
+  #stantbl th:nth-child(2),#stantbl td:nth-child(2),
+  #stantbl th:nth-child(4),#stantbl td:nth-child(4),
+  #stantbl th:nth-child(5),#stantbl td:nth-child(5),
+  #stantbl th:nth-child(7),#stantbl td:nth-child(7),
+  #stantbl th:nth-child(9),#stantbl td:nth-child(9){display:none}
+  #stantbl th,#stantbl td{padding-left:6px;padding-right:6px;font-size:12px}
+  #stantbl td:nth-child(6){white-space:nowrap}
+  #stantbl .b{font-size:10px;padding:3px 7px;white-space:nowrap}
 }
 </style>
 </head>
@@ -1150,7 +1161,7 @@ body.dark{--grp:#232326;--inp:#2C2C2E}
   <div class="card">
     <div class="sr">
       <div class="sw"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Pretraži artikle..." oninput="ft('stantb',this.value)"></div>
-      <select class="fsel" onchange="fSts=this.value;renderStan()"><option value="">Svi statusi</option><option value="ok">Normalno</option><option value="low">Nisko</option><option value="crit">Kritično</option></select>
+      <select class="fsel" onchange="fSts=this.value;renderStan()"><option value="">Svi statusi</option><option value="ok">Normalno</option><option value="low">Nisko</option><option value="crit">Kritično</option><option value="minus">🔻 Minus (dug)</option></select>
       <select class="fsel" id="stanCF" onchange="fCity=this.value;renderStan()"><option value="">Svi gradovi</option></select>
       <select class="fsel" onchange="fCat=this.value;renderStan()"><option value="">Sve kategorije</option><option>Proteinski napitak</option><option>Mass Gainer</option><option>BCAA</option><option>Kreatin</option><option>Pre-Workout</option><option>Vitamini</option><option>Ostalo</option></select>
     </div>
@@ -1891,6 +1902,7 @@ function gp(id){return D.products.find(p=>p.id===id)}
 function gn(id){return D.normativi[id]||null}
 function ss(id){
   const p=gp(id);if(!p)return'none';
+  if((Number(p.stock)||0)<0)return'minus';
   if((Number(p.stock)||0)<=0)return'crit';
   const n=gn(id);if(!n)return'ok';
   if(p.stock<=0||p.stock<n.min)return'crit';
@@ -1898,12 +1910,21 @@ function ss(id){
   return'ok';
 }
 function sbadge(s){
+  if(s==='minus')return'<span class="b bM">🔻 Minus (dug)</span>';
   if(s==='crit')return'<span class="b bR">🔴 Kritično</span>';
   if(s==='low')return'<span class="b bO">🟠 Nisko</span>';
   if(s==='ok')return'<span class="b bG">🟢 Normalno</span>';
   return'<span class="b bN">— Bez normativa</span>';
 }
 
+/* pomoćnik: crveni minus */
+function gHtml(v,sz){const n=Math.round(Number(v)||0);
+  if(n<0)return'<span class="gneg"'+(sz?' style="font-size:'+sz+'"':'')+'>-'+Math.abs(n)+'g</span>';
+  return'<span>'+n+'g</span>';}
+function gTxt(v){const n=Math.round(Number(v)||0);return(n<0?'-':'')+Math.abs(n)+'g';}
+function napOd(v){const n=Number(v)||0;return n<0?-Math.ceil(Math.abs(n)/GRAMA_PO_NAPITKU):Math.floor(n/GRAMA_PO_NAPITKU);}
+function kgTxt(v){const n=Number(v)||0;return(n<0?'-':'')+(Math.abs(n)/1000).toFixed(2)+'kg';}
+function stCol(v){const n=Number(v)||0;return n<0?'var(--red)':n<=0?'var(--red)':n<540?'var(--orange)':'var(--green)';}
 function editIco(){return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';}
 function delIco(){return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>';}
 
@@ -2054,7 +2075,7 @@ function saveEFak(){
       let g=s.kolicina;
       if(s.jedinica==='kg') g=s.kolicina*1000;
       else if(s.jedinica==='pakiranje') g=s.kolicina*G_PO_PAKIRANJU;
-      p.stock=Math.max(0,p.stock-g);
+      p.stock=p.stock-g;
     }
   });
   // Spremi nova polja
@@ -2114,11 +2135,11 @@ function lv(){
   if(!id||g<=0){if(lb)lb.style.display='none';return;}
   const p=gp(id);if(!p){if(lb)lb.style.display='none';return;}
   const aft=p.stock-g;const n=gn(id);
-  const napOstaje=Math.max(0,Math.floor(aft/GRAMA_PO_NAPITKU));
-  document.getElementById('licur').textContent=`${p.stock.toFixed(0)}g (${(p.stock/1000).toFixed(2)}kg · ${Math.floor(p.stock/GRAMA_PO_NAPITKU)} nap.)`;
+  const napOstaje=napOd(aft);
+  document.getElementById('licur').textContent=`${gTxt(p.stock)} (${kgTxt(p.stock)} · ${napOd(p.stock)} nap.)`;
   const liOd=document.getElementById('li-oduzima');
   if(liOd)liOd.textContent=`${g.toFixed(0)}g (${(g/G_PO_PAKIRANJU).toFixed(2)} pak.)`;
-  document.getElementById('liaft').textContent=aft>=0?`${aft.toFixed(0)}g = ${(aft/1000).toFixed(2)}kg`:'0g';
+  document.getElementById('liaft').textContent=`${gTxt(aft)} = ${kgTxt(aft)}`;
   document.getElementById('liaft').style.color=aft<0?'var(--red)':aft<500?'var(--orange)':'var(--green)';
   const liNap=document.getElementById('li-napitaka');
   if(liNap){liNap.textContent=napOstaje;liNap.style.color=napOstaje<20?'var(--red)':napOstaje<50?'var(--orange)':'var(--green)';}
@@ -2137,8 +2158,8 @@ function saveStr(){
   const nap=document.getElementById('snap').value;
   if(!artId||g<=0){toast('Odaberite artikl i unesite količinu (grame)!','warn');return;}
   const prod=gp(artId);if(!prod){toast('Artikl nije pronađen!','err');return;}
-  { const imaAp=stockAp(sAp.id)[artId]||0; const staro=eStrId?((D.stroj.find(x=>x.id===eStrId)||{}).kolicina||0):0;
-    if(!eStrId&&imaAp<g){toast('Nedovoljno na '+sAp.oznaka+'! Ima '+imaAp.toFixed(0)+'g, tražiš '+g.toFixed(0)+'g','err');return;} }
+  { const imaAp=stockAp(sAp.id)[artId]||0;
+    if(!eStrId&&imaAp<g){ const dug=imaAp-g; toast('⚠️ '+sAp.oznaka+': ide u MINUS — stanje će biti '+gTxt(dug)+'. Zapis je spremljen.','warn'); } }
   if(eStrId){
     const e=D.stroj.find(x=>x.id===eStrId);
     if(e){e.kolicina=g;e.stroj=stroj;e.aparat_id=sAp.id;e.operater=op;e.razlog=raz;e.napomena=nap;}
@@ -3007,7 +3028,7 @@ function stockAp(apId){
     ul[st.okus||'']=(ul[st.okus||'']||0)+g; }); });
   D.prodaja.forEach(e=>{ if(e.aparat_id===apId) ul[e.okus||'']=(ul[e.okus||'']||0)-(parseFloat(e.potrebnoG)||0); });
   D.stroj.forEach(e=>{ if(e.aparat_id!==apId) return; const pr=gp(e.artikl_id||''); const ok=pr?(pr.flavor||''):''; ul[ok]=(ul[ok]||0)-(parseFloat(e.kolicina)||0); });
-  D.products.forEach(pr=>{ out[pr.id]=Math.max(0,Math.round(ul[pr.flavor||'']||0)); });
+  D.products.forEach(pr=>{ out[pr.id]=Math.round(ul[pr.flavor||'']||0); });   /* minus dozvoljen */
   return out;
 }
 var _apDepth=0;
@@ -3023,7 +3044,7 @@ function withApView(fn, apId){
     D.stroj=keep.s.filter(x=>x.aparat_id===id);
     D.prodaja=keep.p.filter(x=>x.aparat_id===id);
     D.povijest=keep.pv.filter(x=>x.aparat_id===id);
-    D.products.forEach(x=>{x.stock=map[x.id]||0; x.city=apLok(ap); x.lastEntry=last[x.flavor||'']||'—';});
+    D.products.forEach(x=>{x.stock=(map[x.id]===undefined?0:map[x.id]); x.city=apLok(ap); x.lastEntry=last[x.flavor||'']||'—';});
     return fn();
   } finally {
     D.fakture=keep.f; D.stroj=keep.s; D.prodaja=keep.p; D.povijest=keep.pv;
@@ -3185,7 +3206,7 @@ function prodLiveCalc(){
   const ostaloKom=Math.floor(ostaloG/GRAMA_PO_NAPITKU);
   document.getElementById('calc-kom').textContent=kom;
   document.getElementById('calc-g').textContent=potrebnoG+'g';
-  document.getElementById('calc-ost').textContent=ostaloG>=0?ostaloG.toFixed(0)+'g':'0g';
+  document.getElementById('calc-ost').textContent=gTxt(ostaloG);
   document.getElementById('calc-ost').style.color=ostaloG<0?'var(--red)':ostaloG<(GRAMA_PO_NAPITKU*10)?'var(--orange)':'var(--green)';
   document.getElementById('calc-val').textContent=cij>0?(kom*cij).toFixed(2)+' €':'—';
   const warn=document.getElementById('calc-warn');
@@ -3196,7 +3217,7 @@ function prodLiveCalc(){
     if(wg)wg.textContent=prod.stock.toFixed(0);if(wk)wk.textContent=Math.floor(prod.stock/GRAMA_PO_NAPITKU);
   } else {
     if(warn)warn.style.display='none';if(info)info.style.display='block';
-    const ik=document.getElementById('calc-info-kom');if(ik)ik.textContent=Math.max(0,ostaloKom);
+    const ik=document.getElementById('calc-info-kom');if(ik)ik.textContent=ostaloKom;
   }
 }
 
@@ -3220,8 +3241,7 @@ function saveProdaja(){
     const stari=D.prodaja.find(x=>x.id===eProdId);
     if(stari) prod.stock+=stari.potrebnoG; // vrati
     if(prod.stock<potrebnoG){
-      if(stari) prod.stock-=stari.potrebnoG; // ponovo oduzmi
-      toast(`Nedovoljno! Ima ${prod.stock.toFixed(0)}g = ${Math.floor(prod.stock/GRAMA_PO_NAPITKU)} napitaka`,'err');return;
+      toast(`⚠️ Ide u MINUS — stanje će biti ${gTxt(prod.stock-potrebnoG)}. Zapis je spremljen.`,'warn');
     }
     prod.stock-=potrebnoG;
     D.prodaja=D.prodaja.map(x=>x.id===eProdId?{...x,artikl_id:artId,artikl:prod.name,okus:prod.flavor,kom,potrebnoG,stockPoslije:prod.stock,cij,ukupno:(kom*cij).toFixed(2),datum:dat,operater:op,kanal,aparat_id:apId,nap}:x);
@@ -3229,13 +3249,14 @@ function saveProdaja(){
     toast(`✅ Prodaja ažurirana — ${kom} napitaka (${potrebnoG}g)`);
   } else {
     // NOVI ZAPIS
-    { const imaAp=stockAp(apId)[artId]||0; if(imaAp<potrebnoG){toast('Nedovoljno na '+apO.oznaka+'! Ima '+imaAp.toFixed(0)+'g = '+Math.floor(imaAp/GRAMA_PO_NAPITKU)+' napitaka. Unesite fakturu za ovu lokaciju.','err');return;} }
+    { const imaAp=stockAp(apId)[artId]||0; if(imaAp<potrebnoG){ toast('⚠️ '+apO.oznaka+': ide u MINUS — stanje će biti '+gTxt(imaAp-potrebnoG)+' ('+napOd(imaAp-potrebnoG)+' nap.). Zapis je spremljen — unesite fakturu.','warn'); } }
     const stockPrije=prod.stock;
     prod.stock-=potrebnoG;prod.lastEntry=dat;
     D.prodaja.push({id:uid(),artikl_id:artId,artikl:prod.name,okus:prod.flavor,kom,potrebnoG,stockPrije,stockPoslije:prod.stock,cij,ukupno:(kom*cij).toFixed(2),datum:dat,operater:op,kanal,aparat_id:apId,nap});
     D.povijest.push({dt:now(),vrsta:'Prodaja',artikl:prod.flavor,kolicina:`-${potrebnoG}g (${kom} nap.)`,ref:kanal,grad:prod.city});
     if(document.getElementById('setsp')?.checked)withApView(()=>showSp('prod',[artId]), apId);
-    { const ost=(stockAp(apId)[artId]||0); toast(`✅ ${apO.oznaka}: prodano ${kom} napitaka (${potrebnoG}g) — ostalo ${ost.toFixed(0)}g = ${Math.floor(ost/GRAMA_PO_NAPITKU)} napitaka`); }
+    { const ost=(stockAp(apId)[artId]||0);
+      toast(`${ost<0?'🔻':'✅'} ${apO.oznaka}: prodano ${kom} napitaka (${potrebnoG}g) — ${ost<0?'MINUS ':'ostalo '}${gTxt(ost)} = ${napOd(ost)} napitaka`, ost<0?'warn':'ok'); }
   }
   rstProdaja();renderAll();
 }
@@ -3262,15 +3283,15 @@ function renderProdaja(){
   if(kap){
     if(!D.products.length){kap.innerHTML='<div style="font-size:11px;color:var(--tx3);text-align:center;padding:20px">Nema artikala.</div>';}
     else{kap.innerHTML=D.products.map(p=>{
-      const nap=Math.floor(p.stock/GRAMA_PO_NAPITKU);
-      const pak=(p.stock/G_PO_PAKIRANJU).toFixed(2);
+      const nap=napOd(p.stock);
+      const pak=(Math.abs(p.stock)/G_PO_PAKIRANJU).toFixed(2);
       const col=nap<=0?'var(--red)':nap<20?'var(--orange)':'var(--green)';
       return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--br)">
         <div style="width:10px;height:10px;border-radius:3px;background:${flavorChart(p.flavor)};flex-shrink:0"></div>
         <div style="flex:1;font-size:12px;font-weight:500">${p.flavor||p.name}</div>
         <div style="text-align:right">
           <div style="font-size:14px;font-weight:700;color:${col}">${nap} napitaka</div>
-          <div style="font-size:10px;color:var(--tx3)">${p.stock.toFixed(0)}g · ${pak} pak.</div>
+          <div style="font-size:10px;color:${Number(p.stock)<0?'var(--red)':'var(--tx3)'};font-weight:${Number(p.stock)<0?'700':'400'}">${gTxt(p.stock)}${Number(p.stock)<0?' 🔻 DUG':' · '+pak+' pak.'}</div>
         </div>
       </div>`;}).join('');}
   }
@@ -3326,7 +3347,7 @@ function renderProdaja(){
     });
     entries.forEach(e=>{
       runStock-=Number(e.potrebnoG)||0;
-      snapshots[e.id]=Math.max(0,Math.round(runStock));
+      snapshots[e.id]=Math.round(runStock);   /* minus dozvoljen */
     });
   });
 
@@ -3379,14 +3400,14 @@ function renderProdaja(){
         <tbody>
           ${entries.map(e=>{
             const ost=snapshots[e.id]!==null&&snapshots[e.id]!==undefined?snapshots[e.id]:Number(e.stockPoslije)||0;
-            const napOst=Math.floor(Math.max(0,ost)/GRAMA_PO_NAPITKU);
-            const ostCol=ost<=0?'var(--red)':ost<540?'var(--orange)':'var(--teal)';
+            const napOst=napOd(ost);
+            const ostCol=ost<0?'var(--red)':ost<=0?'var(--red)':ost<540?'var(--orange)':'var(--teal)';
             return`<tr style="border-bottom:1px solid var(--br)">
               <td style="padding:8px 6px 8px 36px"><span style="background:${flavorBg(e.okus)};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">${e.okus}</span></td>
               <td style="padding:8px 6px;font-size:13px;font-weight:700">${e.kom}</td>
               <td style="padding:8px 6px;color:var(--orange);font-weight:600">${Number(e.potrebnoG)||0}g</td>
-              <td style="padding:8px 6px;color:${ostCol};font-weight:600">${Math.max(0,ost).toFixed(0)}g</td>
-              <td style="padding:8px 6px"><strong style="color:var(--green)">${napOst}</strong></td>
+              <td style="padding:8px 6px;color:${ostCol};font-weight:${ost<0?'800':'600'}">${gTxt(ost)}</td>
+              <td style="padding:8px 6px"><strong style="color:${napOst<0?'var(--red)':'var(--green)'}">${napOst}</strong></td>
               <td style="padding:8px 6px;color:var(--green);font-weight:600">${parseFloat(e.ukupno)>0?e.ukupno+' €':'—'}</td>
               <td style="padding:8px 6px;font-size:12px">${e.kanal}</td>
               <td style="padding:8px 6px;font-size:12px">${e.operater||'—'}</td>
@@ -3502,7 +3523,7 @@ function pnImportRows(rows, datum, file, apId, stroj){
     if(!prod){ greske.push('Artikl nije pronađen: '+okus); preskoceno++; continue; }
     const potrebnoG = kom * GRAMA_PO_NAPITKU;
     const cij = kom > 0 ? parseFloat((iznos/kom).toFixed(2)) : 2.70;
-    prod.stock = Math.max(0, (prod.stock||0) - potrebnoG);
+    prod.stock = (prod.stock||0) - potrebnoG;   /* minus dozvoljen */
     prod.lastEntry = datum;
     D.prodaja.push({ id:uid(), artikl_id:prod.id, artikl:prod.name, okus, kom, potrebnoG, stockPoslije:prod.stock, cij,
       ukupno:iznos.toFixed(2), datum, kanal:apLabel(ap)+' (auto)', aparat_id:ap.id, operater:ap.lokacija||'Aparat',
@@ -3905,7 +3926,7 @@ function updSels(){
   updOps();renderOps();
   const cf=document.getElementById('stanCF');const cities=[...new Set(D.products.map(p=>p.city))];const cc=cf.value;cf.innerHTML='<option value="">Svi gradovi</option>'+cities.map(c=>`<option>${c}</option>`).join('');if(cc)cf.value=cc;
 }
-function updCrit(){const k=D.products.filter(p=>ss(p.id)==='crit').length;const nb=document.getElementById('nbk');nb.style.display=k>0?'':'none';nb.textContent=k;}
+function updCrit(){const k=D.products.filter(p=>{const s=ss(p.id);return s==='crit'||s==='minus';}).length;const nb=document.getElementById('nbk');nb.style.display=k>0?'':'none';nb.textContent=k;}
 
 function renderDb(){
   const t=td();
@@ -3916,7 +3937,7 @@ function renderDb(){
   document.getElementById('s-art').textContent=D.products.length;
   document.getElementById('s-dob').textContent=D.dobavljaci.length;
   // Kritično = artikli s manje od 20 napitaka
-  document.getElementById('s-krit').textContent=D.products.filter(p=>Math.floor(p.stock/GRAMA_PO_NAPITKU)<20).length;
+  document.getElementById('s-krit').textContent=D.products.filter(p=>napOd(p.stock)<20).length;
 
   const rc=document.getElementById('db-recent');
   rc.innerHTML=!D.fakture.length
@@ -3925,7 +3946,7 @@ function renderDb(){
 
   const ok=D.products.filter(p=>ss(p.id)==='ok').length;
   const low=D.products.filter(p=>ss(p.id)==='low').length;
-  const crit=D.products.filter(p=>ss(p.id)==='crit').length;
+  const crit=D.products.filter(p=>{const s=ss(p.id);return s==='crit'||s==='minus';}).length;
   const none=D.products.filter(p=>ss(p.id)==='none').length;
   document.getElementById('db-status-wrap').innerHTML=D.products.length===0
     ?'<div style="font-size:13px;color:var(--tx3);text-align:center;padding:12px 0">Nema artikala</div>'
@@ -3934,7 +3955,7 @@ function renderDb(){
   const tb=document.getElementById('dbtb');
   if(!D.products.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"/></svg><p>Nema artikala. Dodajte zalihu putem Ulaz po fakturi.</p></div></td></tr>';return;}
   tb.innerHTML=D.products.map(p=>{const n=gn(p.id);const s=ss(p.id);const pct=n?Math.min(100,Math.round(p.stock/n.opt*100)):null;
-    return`<tr><td><strong>${p.name}</strong></td><td>${p.flavor||'—'}</td><td><span class="b bBl">${p.category}</span></td><td>📍 ${p.city}</td><td><strong>${Number(p.stock).toFixed(0)}g</strong><br><small style="color:var(--tx3)">${(Number(p.stock)/1000).toFixed(2)}kg · ${Math.floor(Number(p.stock)/GRAMA_PO_NAPITKU)} nap.</small></td><td>${n?n.min+'/'+n.opt+' '+n.jed:'<span style="color:var(--tx3)">—</span>'}</td><td>${sbadge(s)}</td><td>${pct!==null?`<div><div style="font-size:11px;color:var(--tx2)">${pct}%</div><div class="sbar"><div class="sbf" style="width:${pct}%;background:${pct<30?'var(--red)':pct<60?'var(--orange)':'var(--green)'}"></div></div></div>`:'—'}</td></tr>`;
+    return`<tr><td><strong>${p.name}</strong></td><td>${p.flavor||'—'}</td><td><span class="b bBl">${p.category}</span></td><td>📍 ${p.city}</td><td><strong ${Number(p.stock)<0?'class="gneg" style="font-size:15px"':''}>${gTxt(p.stock)}</strong><br><small style="color:${Number(p.stock)<0?'var(--red)':'var(--tx3)'}">${kgTxt(p.stock)} · ${napOd(p.stock)} nap.${Number(p.stock)<0?' · DUG':''}</small></td><td>${n?n.min+'/'+n.opt+' '+n.jed:'<span style="color:var(--tx3)">—</span>'}</td><td>${sbadge(s)}</td><td>${pct!==null?`<div><div style="font-size:11px;color:var(--tx2)">${pct}%</div><div class="sbar"><div class="sbf" style="width:${pct}%;background:${pct<30?'var(--red)':pct<60?'var(--orange)':'var(--green)'}"></div></div></div>`:'—'}</td></tr>`;
   }).join('');
 }
 function renderFak(){
@@ -4052,7 +4073,7 @@ function renderNrm(){const tb=document.getElementById('nrmtb');const en=Object.e
       <td><div class="ta"><button class="ib bsm" onclick="editNrm('${id}')" title="Uredi">${editIco()}</button><button class="ib bsm" onclick="delNrm('${id}')" title="Obriši">${delIco()}</button></div></td>
     </tr>`;}).join('');}
 function renderStan(){const tb=document.getElementById('stantb');let pr=D.products;if(fSts)pr=pr.filter(p=>ss(p.id)===fSts);if(fCity)pr=pr.filter(p=>p.city===fCity);if(fCat)pr=pr.filter(p=>p.category===fCat);if(!pr.length){tb.innerHTML='<tr><td colspan="10"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"/></svg><p>Nema artikala s odabranim filterima.</p></div></td></tr>';return;}
-  tb.innerHTML=pr.map((p,i)=>{const n=gn(p.id);const s=ss(p.id);return`<tr><td style="color:var(--tx3)">${i+1}</td><td><strong>${p.name}</strong></td><td>${p.flavor||'—'}</td><td><span class="b bBl">${p.category}</span></td><td>📍 ${p.city}</td><td><strong>${Number(p.stock).toFixed(0)}g</strong><br><small style="color:var(--tx3)">${(Number(p.stock)/1000).toFixed(2)}kg · ${Math.floor(Number(p.stock)/GRAMA_PO_NAPITKU)} nap.</small></td><td>${n?n.min+' '+n.jed:'—'}</td><td>${sbadge(s)}</td><td style="color:var(--tx3);font-size:12px">${p.lastEntry||'—'}</td><td><div class="ta"><button class="ib bsm" onclick="editArt('${p.id}')" title="Uredi">${editIco()}</button><button class="ib bsm" onclick="delArt('${p.id}')" title="Obriši">${delIco()}</button></div></td></tr>`;}).join('');}
+  tb.innerHTML=pr.map((p,i)=>{const n=gn(p.id);const s=ss(p.id);return`<tr><td style="color:var(--tx3)">${i+1}</td><td><strong>${p.name}</strong></td><td>${p.flavor||'—'}</td><td><span class="b bBl">${p.category}</span></td><td>📍 ${p.city}</td><td><strong ${Number(p.stock)<0?'class="gneg" style="font-size:15px"':''}>${gTxt(p.stock)}</strong><br><small style="color:${Number(p.stock)<0?'var(--red)':'var(--tx3)'}">${kgTxt(p.stock)} · ${napOd(p.stock)} nap.${Number(p.stock)<0?' · DUG':''}</small></td><td>${n?n.min+' '+n.jed:'—'}</td><td>${sbadge(s)}</td><td style="color:var(--tx3);font-size:12px">${p.lastEntry||'—'}</td><td><div class="ta"><button class="ib bsm" onclick="editArt('${p.id}')" title="Uredi">${editIco()}</button><button class="ib bsm" onclick="delArt('${p.id}')" title="Obriši">${delIco()}</button></div></td></tr>`;}).join('');}
 /* ── ARTIKLI FORM ── */
 let eArtFormId=null;
 function resetArtForm(){
@@ -4414,7 +4435,7 @@ function exProdMjesec(tip){
     D.fakture.forEach(f=>(f.stavke||[]).forEach(s=>{
       if(s.okus===okus){let g=parseFloat(s.kolicina)||0;if(s.jedinica==='pakiranje')g*=G_PO_PAKIRANJU;else if(s.jedinica==='kg')g*=1000;run+=g;}
     }));
-    entries.forEach(e=>{run-=Number(e.potrebnoG)||0;snapshots[e.id]=Math.max(0,Math.round(run));});
+    entries.forEach(e=>{run-=Number(e.potrebnoG)||0;snapshots[e.id]=Math.round(run);});
   });
 
   // Generiraj HTML tablice po danima — expandirane
@@ -4425,13 +4446,13 @@ function exProdMjesec(tip){
 
     const stavkeRows=entries.map(e=>{
       const ost=snapshots[e.id]!==undefined?snapshots[e.id]:Number(e.stockPoslije)||0;
-      const napOst=Math.floor(Math.max(0,ost)/GRAMA_PO_NAPITKU);
+      const napOst=napOd(ost);
       return `<tr>
         <td style="padding:5px 8px;border:1px solid #e5e7eb">${e.okus}</td>
         <td style="padding:5px 8px;border:1px solid #e5e7eb;text-align:center;font-weight:700;color:#1A6B8A">${e.kom}</td>
         <td style="padding:5px 8px;border:1px solid #e5e7eb;text-align:center;color:#D97706">${Number(e.potrebnoG)||0}g</td>
-        <td style="padding:5px 8px;border:1px solid #e5e7eb;text-align:center;color:#6B7280">${ost.toFixed(0)}g</td>
-        <td style="padding:5px 8px;border:1px solid #e5e7eb;text-align:center;color:#16A34A">${napOst}</td>
+        <td style="padding:5px 8px;border:1px solid #e5e7eb;text-align:center;color:${ost<0?'#FF3B30':'#6B7280'};font-weight:${ost<0?'800':'400'}">${gTxt(ost)}</td>
+        <td style="padding:5px 8px;border:1px solid #e5e7eb;text-align:center;color:${napOst<0?'#FF3B30':'#16A34A'}">${napOst}</td>
         <td style="padding:5px 8px;border:1px solid #e5e7eb;text-align:right;font-weight:700;color:#16A34A">${parseFloat(e.ukupno||0)>0?parseFloat(e.ukupno).toFixed(2)+' €':'—'}</td>
         <td style="padding:5px 8px;border:1px solid #e5e7eb;color:#6B7280;font-size:9px">${e.kanal}</td>
         <td style="padding:5px 8px;border:1px solid #e5e7eb;color:#6B7280;font-size:9px">${e.operater||'—'}</td>
@@ -4618,7 +4639,7 @@ function forceRepairUnits(silent){
     const u = ulazi[okus]||0;
     const p = prodano[okus]||0;
     const o = otpisano[okus]||0;
-    const noviStock = Math.max(0, Math.round(u - p - o));
+    const noviStock = Math.round(u - p - o);   /* minus dozvoljen */
     if(Math.abs(noviStock - (pr.stock||0)) > 1){
       console.log(`Stock ${okus}: ${pr.stock} -> ${noviStock}g`);
       fixedStock++;
@@ -4634,7 +4655,7 @@ function forceRepairUnits(silent){
   prodSorted.forEach(e=>{
     const okus = e.okus||'';
     const g = parseFloat(e.potrebnoG)||0;
-    running[okus] = Math.max(0, (running[okus]||0) - g);
+    running[okus] = (running[okus]||0) - g;   /* minus dozvoljen */
     // Ažuriraj originalni objekt
     const orig = D.prodaja.find(x=>x.id===e.id);
     if(orig) orig.stockPoslije = Math.round(running[okus]);
